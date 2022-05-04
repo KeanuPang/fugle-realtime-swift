@@ -1,0 +1,79 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "async-http-client",
+        "repositoryURL": "https://github.com/swift-server/async-http-client.git",
+        "state": {
+          "branch": null,
+          "revision": "24425989dadab6d6e4167174791a23d4e2a6d0c3",
+          "version": "1.10.0"
+        }
+      },
+      {
+        "package": "ObjectMapper",
+        "repositoryURL": "https://github.com/tristanhimmelman/ObjectMapper.git",
+        "state": {
+          "branch": null,
+          "revision": "0b96a734de3ea1c87374ae677064f86adb0716ec",
+          "version": "4.2.0"
+        }
+      },
+      {
+        "package": "swift-log",
+        "repositoryURL": "https://github.com/apple/swift-log.git",
+        "state": {
+          "branch": null,
+          "revision": "5d66f7ba25daf4f94100e7022febf3c75e37a6c7",
+          "version": "1.4.2"
+        }
+      },
+      {
+        "package": "swift-nio",
+        "repositoryURL": "https://github.com/apple/swift-nio.git",
+        "state": {
+          "branch": null,
+          "revision": "124119f0bb12384cef35aa041d7c3a686108722d",
+          "version": "2.40.0"
+        }
+      },
+      {
+        "package": "swift-nio-extras",
+        "repositoryURL": "https://github.com/apple/swift-nio-extras.git",
+        "state": {
+          "branch": null,
+          "revision": "8eea84ec6144167354387ef9244b0939f5852dc8",
+          "version": "1.11.0"
+        }
+      },
+      {
+        "package": "swift-nio-http2",
+        "repositoryURL": "https://github.com/apple/swift-nio-http2.git",
+        "state": {
+          "branch": null,
+          "revision": "72bcaf607b40d7c51044f65b0f5ed8581a911832",
+          "version": "1.21.0"
+        }
+      },
+      {
+        "package": "swift-nio-ssl",
+        "repositoryURL": "https://github.com/apple/swift-nio-ssl.git",
+        "state": {
+          "branch": null,
+          "revision": "1750873bce84b4129b5303655cce2c3d35b9ed3a",
+          "version": "2.19.0"
+        }
+      },
+      {
+        "package": "swift-nio-transport-services",
+        "repositoryURL": "https://github.com/apple/swift-nio-transport-services.git",
+        "state": {
+          "branch": null,
+          "revision": "1a4692acb88156e3da1b0c6732a8a38b2a744166",
+          "version": "1.12.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
