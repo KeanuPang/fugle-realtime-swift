@@ -8,16 +8,12 @@
 import Foundation
 import ObjectMapper
 
-class ResponseQuoteData: Mappable {
-    var apiVersion: String?
-    var info: Info?
+class ResponseQuoteData: MappableDataClass {
     var quote: Quote?
 
-    required init?(map: Map) {}
+    override func mapping(map: Map) {
+        super.mapping(map: map)
 
-    func mapping(map: Map) {
-        apiVersion <- map["apiVersion"]
-        info <- map["data.info"]
         quote <- map["data.quote"]
     }
 }

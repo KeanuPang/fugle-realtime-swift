@@ -8,16 +8,12 @@
 import Foundation
 import ObjectMapper
 
-class ResponseChartData: Mappable {
-    var apiVersion: String?
-    var info: Info?
+class ResponseChartData: MappableDataClass {
     var chart: Chart?
 
-    required init?(map: Map) {}
+    override func mapping(map: Map) {
+        super.mapping(map: map)
 
-    func mapping(map: Map) {
-        apiVersion <- map["apiVersion"]
-        info <- map["data.info"]
         chart <- map["data.chart"]
     }
 }

@@ -41,6 +41,10 @@ class CommonError: Mappable, Error {
     static func unknownError(info: String) -> CommonError {
         return CommonError(error: ErrorDetails(message: "Unknown error occured by \(info)"))
     }
+
+    static func jsonError(rawValue: String) -> CommonError {
+        return CommonError(error: ErrorDetails(message: "JSON parse failed: \(rawValue)"))
+    }
 }
 
 extension Error {

@@ -8,8 +8,21 @@
 import Foundation
 import NIOCore
 
-let FUGLE_ENDPOINT_INTRADAY = "https://api.fugle.tw/realtime/v0.3/intraday"
-let FUGLE_ENDPOINT_MARKETDATA = "https://api.fugle.tw/marketdata/v0.3/candles"
+let ENDPOINT_VERSION = "v0.3"
+let ENDPOINT_DOMAIN = "api.fugle.tw"
+
+enum ENDPOINT_METHOD: String {
+    case HTTP = "https://"
+    case WEB_SOCKET = "wss://"
+
+    var intraDayURL: String {
+        return "\(self.rawValue)\(ENDPOINT_DOMAIN)/realtime/\(ENDPOINT_VERSION)/intraday"
+    }
+
+    var marketDataURL: String {
+        return "\(self.rawValue)\(ENDPOINT_DOMAIN)/marketdata/\(ENDPOINT_VERSION)/candles"
+    }
+}
 
 let DEFAULT_REQUEST_TIMEOUT: TimeAmount = .seconds(30)
 let DEFAULT_RESPONSE_MAX_SIZE = 1024 * 1024 * 3 // 3 MB
@@ -53,11 +66,6 @@ enum IntradayParameters: String, CaseIterable {
     case symbolId
     case apiToken
     case oddLot
-}
-
-enum IntradayParametersPaging: String, CaseIterable {
-    case limit
-    case offset
 }
 
 enum CandleParameters: String, CaseIterable {

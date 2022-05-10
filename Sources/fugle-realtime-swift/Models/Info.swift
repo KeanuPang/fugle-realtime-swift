@@ -8,7 +8,24 @@
 import Foundation
 import ObjectMapper
 
-class Info: Mappable {
+protocol MappableData: Mappable {
+    var apiVersion: String? { get set }
+    var info: Info? { get set }
+}
+
+class MappableDataClass: MappableData {
+    var apiVersion: String?
+    var info: Info?
+
+    required init?(map: Map) {}
+
+    func mapping(map: Map) {
+        apiVersion <- map["apiVersion"]
+        info <- map["data.info"]
+    }
+}
+
+class Info: MappableDataClass {
     var date: String = ""
     var type: String = ""
     var exchange: String = ""
@@ -18,9 +35,9 @@ class Info: Mappable {
     var timeZone: String = ""
     var lastUpdatedAt: String?
 
-    required init?(map: Map) {}
+    override func mapping(map: Map) {
+        super.mapping(map: map)
 
-    func mapping(map: Map) {
         date <- map["date"]
         type <- map["type"]
         exchange <- map["exchange"]

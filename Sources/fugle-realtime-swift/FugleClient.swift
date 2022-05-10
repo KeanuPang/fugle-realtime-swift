@@ -7,9 +7,13 @@
 
 import AsyncHTTPClient
 import Foundation
+import NIO
 import NIOCore
 import NIOFoundationCompat
+import NIOHTTP1
+import NIOWebSocket
 import ObjectMapper
+import WebSocketKit
 
 public class FugleClient {
     static let shared = FugleClient()
@@ -24,6 +28,8 @@ public class FugleClient {
     private let client: HTTPClient
     private var apiToken: String = ""
 
+    private(set) var eventLoopGroup: EventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+
     private init() {
         self.client = HTTPClient(eventLoopGroupProvider: .createNew)
     }
@@ -32,8 +38,12 @@ public class FugleClient {
         self.apiToken = token
     }
 
-    func getIntraday<T: Mappable>(_ type: T.Type, resource: IntradayResource, symbol: String) async throws -> T? {
-        let request = buildIntradayRequest(resource: resource, symbol: symbol)
+    func shutdown() throws {
+        try self.client.syncShutdown()
+    }
+
+    func getIntraday<T: MappableData>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false) async throws -> T? {
+        let request = buildIntradayRequest(method: .HTTP, resource: resource, symbol: symbol, oddLot: oddLot)
         let response = try await client.execute(request, timeout: DEFAULT_REQUEST_TIMEOUT)
         let body = try await response.body.collect(upTo: DEFAULT_RESPONSE_MAX_SIZE)
 
@@ -58,7 +68,7 @@ public class FugleClient {
         return Mapper<ResponseCandleData>().map(JSONString: String(buffer: body))
     }
 
-    private func buildIntradayRequest(resource: IntradayResource, symbol: String, oddLot: Bool = false) -> HTTPClientRequest {
+    private func buildIntradayRequest(method: ENDPOINT_METHOD, resource: IntradayResource, symbol: String, oddLot: Bool = false) -> HTTPClientRequest {
         var parameters = ""
         IntradayParameters.allCases.forEach {
             switch $0 {
@@ -72,7 +82,7 @@ public class FugleClient {
         }
 
         parameters += resource.pagingParameters ?? ""
-        let request = HTTPClientRequest(url: "\(FUGLE_ENDPOINT_INTRADAY)/\(resource.name)?\(parameters)")
+        let request = HTTPClientRequest(url: "\(method.intraDayURL)/\(resource.name)?\(parameters)")
         dumpRequest(request)
         return request
     }
@@ -92,7 +102,7 @@ public class FugleClient {
             }
         }
 
-        let request = HTTPClientRequest(url: "\(FUGLE_ENDPOINT_MARKETDATA)?\(parameters)")
+        let request = HTTPClientRequest(url: "\(ENDPOINT_METHOD.HTTP.marketDataURL)?\(parameters)")
         dumpRequest(request)
         return request
     }
@@ -105,5 +115,28 @@ public class FugleClient {
     private func dumpResponseData(_ body: ByteBuffer) {
         guard logger.logLevel == .debug else { return }
         logger.debug("\(String(buffer: body))")
+    }
+}
+
+extension FugleClient {
+    @available(macOS 12, *)
+    func connectIntraday<T: MappableData>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false) async throws -> T? {
+        let promise = self.eventLoopGroup.next().makePromise(of: type)
+        let request = buildIntradayRequest(method: .WEB_SOCKET, resource: resource, symbol: symbol, oddLot: oddLot)
+
+        _ = WebSocket.connect(to: request.url, on: self.eventLoopGroup) { ws in
+            ws.onText { ws, json async in
+
+                guard let result = Mapper<T>().map(JSONString: json) else {
+                    promise.fail(CommonError.jsonError(rawValue: json))
+                    return
+                }
+                guard let type = result.info?.type, type != "ODDLOT" else { return }
+
+                promise.succeed(result)
+            }
+        }
+
+        return try promise.futureResult.wait()
     }
 }

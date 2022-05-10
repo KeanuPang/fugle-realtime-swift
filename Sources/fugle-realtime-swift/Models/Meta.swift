@@ -8,16 +8,12 @@
 import Foundation
 import ObjectMapper
 
-class ResponseMetaData: Mappable {
-    var apiVersion: String?
-    var info: Info?
+class ResponseMetaData: MappableDataClass {
     var meta: Meta?
 
-    required init?(map: Map) {}
+    override func mapping(map: Map) {
+        super.mapping(map: map)
 
-    func mapping(map: Map) {
-        apiVersion <- map["apiVersion"]
-        info <- map["data.info"]
         meta <- map["data.meta"]
     }
 }
