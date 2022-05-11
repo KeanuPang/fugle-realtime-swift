@@ -27,9 +27,14 @@ final class WebSocketClientTests: XCTestCase {
         var response: ResponseMetaData?
 
         let expectedResult = expectation(description: "waiting")
-        try client.streamIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId, callback: { result in
-            response = result as? ResponseMetaData
-            expectedResult.fulfill()
+        try client.streamIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId, callback: {
+            switch $0 {
+            case .success(let result):
+                response = result
+                expectedResult.fulfill()
+            case .failure(let failures):
+                XCTFail(failures.toString())
+            }
         })
 
         waitForExpectations(timeout: 1, handler: { _ in
@@ -49,9 +54,14 @@ final class WebSocketClientTests: XCTestCase {
         var response: ResponseQuoteData?
 
         let expectedResult = expectation(description: "waiting")
-        try client.streamIntraday(ResponseQuoteData.self, resource: .quote, symbol: symbolId, callback: { result in
-            response = result as? ResponseQuoteData
-            expectedResult.fulfill()
+        try client.streamIntraday(ResponseQuoteData.self, resource: .quote, symbol: symbolId, callback: {
+            switch $0 {
+            case .success(let result):
+                response = result
+                expectedResult.fulfill()
+            case .failure(let failures):
+                XCTFail(failures.toString())
+            }
         })
 
         waitForExpectations(timeout: 1, handler: { _ in
@@ -71,9 +81,14 @@ final class WebSocketClientTests: XCTestCase {
         var response: ResponseChartData?
 
         let expectedResult = expectation(description: "waiting")
-        try client.streamIntraday(ResponseChartData.self, resource: .chart, symbol: symbolId, callback: { result in
-            response = result as? ResponseChartData
-            expectedResult.fulfill()
+        try client.streamIntraday(ResponseChartData.self, resource: .chart, symbol: symbolId, callback: {
+            switch $0 {
+            case .success(let result):
+                response = result
+                expectedResult.fulfill()
+            case .failure(let failures):
+                XCTFail(failures.toString())
+            }
         })
 
         waitForExpectations(timeout: 1, handler: { _ in

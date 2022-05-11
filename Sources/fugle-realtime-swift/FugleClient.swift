@@ -124,11 +124,10 @@ public class FugleClient {
 
 extension FugleClient {
     @available(macOS 12, *)
-    func streamIntraday<T: MappableData>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false, callback: ((Mappable) -> Void)? = nil) throws {
+    func streamIntraday<T: MappableData>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false, callback: ((Result<T, CommonError>) -> Void)? = nil) throws {
         switch resource {
         case .dealts(_, _),
              .volumes:
-//            callback(CommonError.unsupportedEroor(info: resource.name))
             throw CommonError.unsupportedEroor(info: resource.name)
         default:
             break
@@ -139,12 +138,12 @@ extension FugleClient {
         _ = WebSocket.connect(to: request.url, on: self.eventLoopGroup) { ws in
             ws.onText { ws, json in
                 guard let result = Mapper<T>().map(JSONString: json) else {
-                    callback?(CommonError.jsonError(rawValue: json))
+                    callback?(.failure(CommonError.jsonError(rawValue: json)))
                     return
                 }
                 guard let type = result.info?.type, type != "ODDLOT" else { return }
 
-                callback?(result)
+                callback?(.success(result))
             }
         }
     }
