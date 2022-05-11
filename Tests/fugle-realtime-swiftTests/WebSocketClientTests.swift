@@ -8,26 +8,90 @@
 @testable import fugle_realtime_swift
 import XCTest
 
-class WebSocketClientTests: XCTestCase {
+@available(macOS 12, *)
+final class WebSocketClientTests: XCTestCase {
     private let apiToken: String = "demo"
     private let symbolId: String = "2884"
 
     private lazy var client: FugleClient = FugleClient.initWithApiToken(apiToken)
 
-    override func tearDownWithError() throws {
-        try client.shutdown()
+    override func setUp() {
+        client = FugleClient.initWithApiToken(apiToken)
     }
 
-    @available(macOS 12, *)
-    func testMetaRequestWS() async throws {
-        do {
-            let result = try await client.connectIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId)
+    override class func tearDown() {
+        FugleClient.shared.shutdownWS()
+    }
 
-            let price = (try XCTUnwrap(result?.meta?.priceReference))
-            XCTAssertTrue(price.decimalValue > 0)
+    func testMetaRequestWS() throws {
+        var response: ResponseMetaData?
 
-        } catch {
-            XCTFail(error.toString())
-        }
+        let expectedResult = expectation(description: "waiting")
+        try client.streamIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId, callback: { result in
+            response = result as? ResponseMetaData
+            expectedResult.fulfill()
+        })
+
+        waitForExpectations(timeout: 1, handler: { _ in
+            do {
+                let info = (try XCTUnwrap(response?.info))
+                let priceReference = (try XCTUnwrap(response?.meta?.priceReference))
+
+                XCTAssertEqual(self.symbolId, info.symbolId)
+                XCTAssertTrue(priceReference.decimalValue > 0)
+            } catch {
+                XCTFail(error.toString())
+            }
+        })
+    }
+
+    func testQuoteRequestWS() throws {
+        var response: ResponseQuoteData?
+
+        let expectedResult = expectation(description: "waiting")
+        try client.streamIntraday(ResponseQuoteData.self, resource: .quote, symbol: symbolId, callback: { result in
+            response = result as? ResponseQuoteData
+            expectedResult.fulfill()
+        })
+
+        waitForExpectations(timeout: 1, handler: { _ in
+            do {
+                let info = (try XCTUnwrap(response?.info))
+                let quoteChange = (try XCTUnwrap(response?.quote?.change))
+
+                XCTAssertEqual(self.symbolId, info.symbolId)
+                XCTAssertTrue(quoteChange.decimalValue > 0)
+            } catch {
+                XCTFail(error.toString())
+            }
+        })
+    }
+
+    func testChartRequestWS() throws {
+        var response: ResponseChartData?
+
+        let expectedResult = expectation(description: "waiting")
+        try client.streamIntraday(ResponseChartData.self, resource: .chart, symbol: symbolId, callback: { result in
+            response = result as? ResponseChartData
+            expectedResult.fulfill()
+        })
+
+        waitForExpectations(timeout: 1, handler: { _ in
+            do {
+                let info = (try XCTUnwrap(response?.info))
+                let volume = (try XCTUnwrap(response?.chart?.v))
+
+                XCTAssertEqual(self.symbolId, info.symbolId)
+                XCTAssertTrue(volume.count > 0)
+            } catch {
+                XCTFail(error.toString())
+            }
+        })
+    }
+
+    func testDealtsRequestWS() throws {
+        XCTAssertThrowsError(
+            try client.streamIntraday(ResponseDealtsData.self, resource: .dealts(), symbol: symbolId)
+        )
     }
 }

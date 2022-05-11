@@ -42,6 +42,10 @@ class CommonError: Mappable, Error {
         return CommonError(error: ErrorDetails(message: "Unknown error occured by \(info)"))
     }
 
+    static func unsupportedEroor(info: String) -> CommonError {
+        return CommonError(error: ErrorDetails(message: "Unsupported operation: \(info)"))
+    }
+
     static func jsonError(rawValue: String) -> CommonError {
         return CommonError(error: ErrorDetails(message: "JSON parse failed: \(rawValue)"))
     }
@@ -49,6 +53,6 @@ class CommonError: Mappable, Error {
 
 extension Error {
     func toString() -> String {
-        (self as? Encodable)?.toString() ?? self.localizedDescription
+        (self as? CommonError)?.toJSONString(prettyPrint: true) ?? self.localizedDescription
     }
 }

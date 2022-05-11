@@ -38,8 +38,12 @@ public class FugleClient {
         self.apiToken = token
     }
 
-    func shutdown() throws {
-        try self.client.syncShutdown()
+    func shutdown() {
+        try? self.client.syncShutdown()
+    }
+
+    func shutdownWS() {
+        try? self.eventLoopGroup.syncShutdownGracefully()
     }
 
     func getIntraday<T: MappableData>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false) async throws -> T? {
@@ -120,23 +124,28 @@ public class FugleClient {
 
 extension FugleClient {
     @available(macOS 12, *)
-    func connectIntraday<T: MappableData>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false) async throws -> T? {
-        let promise = self.eventLoopGroup.next().makePromise(of: type)
+    func streamIntraday<T: MappableData>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false, callback: ((Mappable) -> Void)? = nil) throws {
+        switch resource {
+        case .dealts(_, _),
+             .volumes:
+//            callback(CommonError.unsupportedEroor(info: resource.name))
+            throw CommonError.unsupportedEroor(info: resource.name)
+        default:
+            break
+        }
+
         let request = buildIntradayRequest(method: .WEB_SOCKET, resource: resource, symbol: symbol, oddLot: oddLot)
 
         _ = WebSocket.connect(to: request.url, on: self.eventLoopGroup) { ws in
-            ws.onText { ws, json async in
-
+            ws.onText { ws, json in
                 guard let result = Mapper<T>().map(JSONString: json) else {
-                    promise.fail(CommonError.jsonError(rawValue: json))
+                    callback?(CommonError.jsonError(rawValue: json))
                     return
                 }
                 guard let type = result.info?.type, type != "ODDLOT" else { return }
 
-                promise.succeed(result)
+                callback?(result)
             }
         }
-
-        return try promise.futureResult.wait()
     }
 }

@@ -34,7 +34,7 @@ enum IntradayResource {
     case chart
     case quote
     case meta
-    case dealts(PAGING_LIMIT, PAGING_OFFSET)
+    case dealts(PAGING_LIMIT = 50, PAGING_OFFSET = 0)
     case volumes
 
     var name: String {
