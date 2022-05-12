@@ -124,7 +124,7 @@ public class FugleClient {
 
 extension FugleClient {
     @available(macOS 12, *)
-    func streamIntraday<T: MappableData>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false, callback: ((Result<T, CommonError>) -> Void)? = nil) throws {
+    func streamIntraday<T: MappableData>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false, callback: ((Result<T, CommonError>) -> Void)? = nil) throws -> EventLoopPromise<T> {
         switch resource {
         case .dealts(_, _),
              .volumes:
@@ -135,6 +135,7 @@ extension FugleClient {
 
         let request = buildIntradayRequest(method: .WEB_SOCKET, resource: resource, symbol: symbol, oddLot: oddLot)
 
+        let promise = self.eventLoopGroup.next().makePromise(of: type)
         _ = WebSocket.connect(to: request.url, on: self.eventLoopGroup) { ws in
             ws.onText { ws, json in
                 guard let result = Mapper<T>().map(JSONString: json) else {
@@ -146,5 +147,7 @@ extension FugleClient {
                 callback?(.success(result))
             }
         }
+
+        return promise
     }
 }

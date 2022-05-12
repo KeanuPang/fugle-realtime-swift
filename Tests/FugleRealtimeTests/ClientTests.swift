@@ -1,4 +1,4 @@
-@testable import fugle_realtime_swift
+@testable import FugleRealtime
 import XCTest
 
 final class ClientTests: XCTestCase {
