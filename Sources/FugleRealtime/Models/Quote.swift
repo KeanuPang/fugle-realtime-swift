@@ -8,17 +8,17 @@
 import Foundation
 import ObjectMapper
 
-class ResponseQuoteData: MappableDataClass {
+public class ResponseQuoteData: MappableDataClass {
     var quote: Quote?
 
-    override func mapping(map: Map) {
+    override public func mapping(map: Map) {
         super.mapping(map: map)
 
         quote <- map["data.quote"]
     }
 }
 
-class Quote: Mappable {
+public class Quote: Mappable {
     var isCurbing: Bool?
     var isCurbingFall: Bool?
     var isCurbingRise: Bool?
@@ -44,9 +44,9 @@ class Quote: Mappable {
     var amplitude: NSDecimalNumber?
     var priceLimit: UInt8?
 
-    required init?(map: Map) {}
+    public required init?(map: Map) {}
 
-    func mapping(map: Map) {
+    public func mapping(map: Map) {
         isCurbing <- map["isCurbing"]
         isCurbingFall <- map["isCurbingFall"]
         isCurbingRise <- map["isCurbingRise"]

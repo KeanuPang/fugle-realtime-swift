@@ -16,9 +16,9 @@ import ObjectMapper
 import WebSocketKit
 
 public class FugleClient {
-    static let shared = FugleClient()
+    public static let shared = FugleClient()
 
-    static func initWithApiToken(_ token: String) -> FugleClient {
+    public static func initWithApiToken(_ token: String) -> FugleClient {
         let shared = FugleClient.shared
         shared.apiToken = token
         return shared
@@ -34,19 +34,19 @@ public class FugleClient {
         self.client = HTTPClient(eventLoopGroupProvider: .createNew)
     }
 
-    func setupApiToken(_ token: String) {
+    public func setupApiToken(_ token: String) {
         self.apiToken = token
     }
 
-    func shutdown() {
+    public func shutdown() {
         try? self.client.syncShutdown()
     }
 
-    func shutdownWS() {
+    public func shutdownWS() {
         try? self.eventLoopGroup.syncShutdownGracefully()
     }
 
-    func getIntraday<T: MappableData>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false) async throws -> T? {
+    public func getIntraday<T: MappableData>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false) async throws -> T? {
         let request = buildIntradayRequest(method: .HTTP, resource: resource, symbol: symbol, oddLot: oddLot)
         let response = try await client.execute(request, timeout: DEFAULT_REQUEST_TIMEOUT)
         let body = try await response.body.collect(upTo: DEFAULT_RESPONSE_MAX_SIZE)
@@ -59,7 +59,7 @@ public class FugleClient {
         return Mapper<T>().map(JSONString: String(buffer: body))
     }
 
-    func getMarketData(symbol: String, apiToken: String, from: String, to: String) async throws -> ResponseCandleData? {
+    public func getMarketData(symbol: String, apiToken: String, from: String, to: String) async throws -> ResponseCandleData? {
         let request = buildMarketDataRequest(symbol: symbol, from: from, to: to)
         let response = try await client.execute(request, timeout: DEFAULT_REQUEST_TIMEOUT)
         let body = try await response.body.collect(upTo: DEFAULT_RESPONSE_MAX_SIZE)
@@ -124,7 +124,7 @@ public class FugleClient {
 
 extension FugleClient {
     @available(macOS 12, *)
-    func streamIntraday<T: MappableData>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false, callback: ((Result<T, CommonError>) -> Void)? = nil) throws -> EventLoopPromise<T> {
+    public func streamIntraday<T: MappableData>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false, callback: ((Result<T, CommonError>) -> Void)? = nil) throws -> EventLoopPromise<T> {
         switch resource {
         case .dealts(_, _),
              .volumes:

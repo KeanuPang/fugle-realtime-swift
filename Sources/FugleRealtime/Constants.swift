@@ -27,10 +27,10 @@ enum ENDPOINT_METHOD: String {
 let DEFAULT_REQUEST_TIMEOUT: TimeAmount = .seconds(30)
 let DEFAULT_RESPONSE_MAX_SIZE = 1024 * 1024 * 3 // 3 MB
 
-typealias PAGING_LIMIT = UInt
-typealias PAGING_OFFSET = UInt
+public typealias PAGING_LIMIT = UInt
+public typealias PAGING_OFFSET = UInt
 
-enum IntradayResource {
+public enum IntradayResource {
     case chart
     case quote
     case meta
@@ -62,13 +62,13 @@ enum IntradayResource {
     }
 }
 
-enum IntradayParameters: String, CaseIterable {
+public enum IntradayParameters: String, CaseIterable {
     case symbolId
     case apiToken
     case oddLot
 }
 
-enum CandleParameters: String, CaseIterable {
+public enum CandleParameters: String, CaseIterable {
     case symbolId
     case apiToken
     case from

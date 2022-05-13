@@ -8,17 +8,17 @@
 import Foundation
 import ObjectMapper
 
-class ResponseMetaData: MappableDataClass {
+public class ResponseMetaData: MappableDataClass {
     var meta: Meta?
 
-    override func mapping(map: Map) {
+    override public func mapping(map: Map) {
         super.mapping(map: map)
 
         meta <- map["data.meta"]
     }
 }
 
-class Meta: Mappable {
+public class Meta: Mappable {
     var market: String?
     var nameZhTw: String?
     var industryZhTw: String?
@@ -37,9 +37,9 @@ class Meta: Mappable {
     var abnormal: String?
     var isUnusuallyRecommended: Bool?
 
-    required init?(map: Map) {}
+    public required init?(map: Map) {}
 
-    func mapping(map: Map) {
+    public func mapping(map: Map) {
         market <- map["market"]
         nameZhTw <- map["nameZhTw"]
         industryZhTw <- map["industryZhTw"]

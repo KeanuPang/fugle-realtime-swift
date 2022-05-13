@@ -7,18 +7,18 @@
 
 import ObjectMapper
 
-class CommonError: MappableData, Error {
-    var apiVersion: String?
-    var info: Info?
+public class CommonError: MappableData, Error {
+    public var apiVersion: String?
+    public var info: Info?
     var error: ErrorDetails?
 
-    required init?(map: Map) {}
+    public required init?(map: Map) {}
 
     init(error: ErrorDetails) {
         self.error = error
     }
 
-    func mapping(map: Map) {
+    public func mapping(map: Map) {
         apiVersion <- map["apiVersion"]
         error <- map["error"]
     }

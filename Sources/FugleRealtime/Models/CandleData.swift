@@ -8,7 +8,7 @@
 import Foundation
 import ObjectMapper
 
-class ResponseCandleData: Mappable {
+public class ResponseCandleData: Mappable {
     var symbolId: String?
     var type: String?
     var exchange: String?
@@ -16,9 +16,9 @@ class ResponseCandleData: Mappable {
 
     var candles = [CandleData]()
 
-    required init?(map: Map) {}
+    public required init?(map: Map) {}
 
-    func mapping(map: Map) {
+    public func mapping(map: Map) {
         symbolId <- map["symbolId"]
         type <- map["type"]
         exchange <- map["exchange"]
@@ -27,7 +27,7 @@ class ResponseCandleData: Mappable {
     }
 }
 
-class CandleData: Mappable {
+public class CandleData: Mappable {
     var date: String?
     var open: NSDecimalNumber?
     var high: NSDecimalNumber?
@@ -35,9 +35,9 @@ class CandleData: Mappable {
     var close: NSDecimalNumber?
     var volume: UInt64?
 
-    required init?(map: Map) {}
+    public required init?(map: Map) {}
 
-    func mapping(map: Map) {
+    public func mapping(map: Map) {
         date <- map["date"]
         open <- (map["open"], NSDecimalNumberTransform())
         high <- (map["high"], NSDecimalNumberTransform())

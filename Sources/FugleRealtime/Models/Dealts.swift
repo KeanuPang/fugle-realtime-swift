@@ -8,17 +8,17 @@
 import Foundation
 import ObjectMapper
 
-class ResponseDealtsData: MappableDataClass {
+public class ResponseDealtsData: MappableDataClass {
     var dealts = [Dealts]()
 
-    override func mapping(map: Map) {
+    override public func mapping(map: Map) {
         super.mapping(map: map)
 
         dealts <- map["data.dealts"]
     }
 }
 
-class Dealts: Mappable {
+public class Dealts: Mappable {
     var at: String?
     var bid: NSDecimalNumber?
     var ask: NSDecimalNumber?
@@ -26,9 +26,9 @@ class Dealts: Mappable {
     var volume: UInt64?
     var serial: UInt64?
 
-    required init?(map: Map) {}
+    public required init?(map: Map) {}
 
-    func mapping(map: Map) {
+    public func mapping(map: Map) {
         at <- map["at"]
         bid <- (map["bid"], NSDecimalNumberTransform())
         ask <- (map["ask"], NSDecimalNumberTransform())

@@ -8,17 +8,17 @@
 import Foundation
 import ObjectMapper
 
-class ResponseChartData: MappableDataClass {
+public class ResponseChartData: MappableDataClass {
     var chart: Chart?
 
-    override func mapping(map: Map) {
+    override public func mapping(map: Map) {
         super.mapping(map: map)
 
         chart <- map["data.chart"]
     }
 }
 
-class Chart: Mappable {
+public class Chart: Mappable {
     var a = [NSDecimalNumber]()
     var o = [NSDecimalNumber]()
     var h = [NSDecimalNumber]()
@@ -27,9 +27,9 @@ class Chart: Mappable {
     var v = [UInt64]()
     var t = [UInt64]()
 
-    required init?(map: Map) {}
+    public required init?(map: Map) {}
 
-    func mapping(map: Map) {
+    public func mapping(map: Map) {
         a <- (map["a"], NSDecimalNumberTransform())
         o <- (map["o"], NSDecimalNumberTransform())
         h <- (map["h"], NSDecimalNumberTransform())
