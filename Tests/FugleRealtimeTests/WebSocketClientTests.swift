@@ -9,7 +9,6 @@
 import NIO
 import XCTest
 
-@available(macOS 12, *)
 final class WebSocketClientTests: XCTestCase {
     private let apiToken: String = "demo"
     private let symbolId: String = "2884"

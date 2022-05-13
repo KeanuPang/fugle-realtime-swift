@@ -123,7 +123,6 @@ public class FugleClient {
 }
 
 extension FugleClient {
-    @available(macOS 12, *)
     public func streamIntraday<T: MappableData>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false, callback: ((Result<T, CommonError>) -> Void)? = nil) throws -> EventLoopPromise<T> {
         switch resource {
         case .dealts(_, _),
