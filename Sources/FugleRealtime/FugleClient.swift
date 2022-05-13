@@ -46,7 +46,7 @@ public class FugleClient {
         try? self.eventLoopGroup.syncShutdownGracefully()
     }
 
-    public func getIntraday<T: MappableData>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false) async throws -> T? {
+    public func getIntraday<T>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false) async throws -> T? where T: MappableData {
         let request = buildIntradayRequest(method: .HTTP, resource: resource, symbol: symbol, oddLot: oddLot)
         let response = try await client.execute(request, timeout: DEFAULT_REQUEST_TIMEOUT)
         let body = try await response.body.collect(upTo: DEFAULT_RESPONSE_MAX_SIZE)
@@ -123,7 +123,8 @@ public class FugleClient {
 }
 
 extension FugleClient {
-    public func streamIntraday<T: MappableData>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false, callback: ((Result<T, CommonError>) -> Void)? = nil) throws -> EventLoopPromise<T> {
+    public func streamIntraday<T>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false, callback: ((Result<T, CommonError>) -> Void)?) throws -> EventLoopPromise<T>
+        where T: MappableData {
         switch resource {
         case .dealts(_, _),
              .volumes:

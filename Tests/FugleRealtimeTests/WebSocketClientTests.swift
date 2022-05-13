@@ -88,7 +88,7 @@ final class WebSocketClientTests: XCTestCase {
 
     func testDealtsRequestWS() throws {
         XCTAssertThrowsError(
-            try client.streamIntraday(ResponseDealtsData.self, resource: .dealts(), symbol: symbolId)
+            try client.streamIntraday(ResponseDealtsData.self, resource: .dealts(), symbol: symbolId, callback: nil)
         )
     }
 }
