@@ -23,6 +23,34 @@ final class WebSocketClientTests: XCTestCase {
         FugleClient.shared.shutdownWS()
     }
 
+    func testUnauthorizedRequest() async throws {
+        client = FugleClient.initWithApiToken("")
+
+        do {
+            var promise: EventLoopPromise<ResponseMetaData>?
+            promise = try await client.streamIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId, callback: nil)
+
+            _ = try promise?.futureResult.wait()
+            XCTFail()
+        } catch {
+            XCTAssertNotNil(error)
+        }
+    }
+    
+    func testInvalidToken() async throws {
+        client = FugleClient.initWithApiToken("abcdefghijklmn")
+
+        do {
+            var promise: EventLoopPromise<ResponseMetaData>?
+            promise = try await client.streamIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId, callback: nil)
+
+            _ = try promise?.futureResult.wait()
+            XCTFail()
+        } catch {
+            XCTAssertNotNil(error)
+        }
+    }
+
     func testMetaRequestWS() async throws {
         var promise: EventLoopPromise<ResponseMetaData>?
 

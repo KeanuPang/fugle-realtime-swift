@@ -15,6 +15,28 @@ final class ClientTests: XCTestCase {
         FugleClient.shared.shutdown()
     }
 
+    func testUnauthorizedRequest() async throws {
+        client = FugleClient.initWithApiToken("")
+
+        do {
+            _ = try await client.getIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId)
+        } catch {
+            XCTAssertTrue(error is ClientError)
+            XCTAssertEqual(401, try XCTUnwrap((error as? ClientError)?.error?.code))
+        }
+    }
+
+    func testInvalidToken() async throws {
+        client = FugleClient.initWithApiToken("abcdefghijklmn")
+
+        do {
+            _ = try await client.getIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId)
+        } catch {
+            XCTAssertTrue(error is ClientError)
+            XCTAssertEqual(400, try XCTUnwrap((error as? ClientError)?.error?.code))
+        }
+    }
+
     func testMetaRequest() async throws {
         do {
             let response: ResponseMetaData? = try await client.getIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId)

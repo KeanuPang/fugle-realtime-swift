@@ -51,7 +51,7 @@ public class FugleClient {
         let body = try await response.body.collect(upTo: DEFAULT_RESPONSE_MAX_SIZE)
 
         guard response.status == .ok else {
-            throw Mapper<CommonError>().map(JSONString: String(buffer: body)) ?? CommonError.unknownError(info: request.url)
+            throw Mapper<ClientError>().map(JSONString: String(buffer: body)) ?? ClientError.unexpectedError(info: request.url)
         }
 
         return Mapper<T>().map(JSONString: String(buffer: body))
@@ -63,7 +63,7 @@ public class FugleClient {
         let body = try await response.body.collect(upTo: DEFAULT_RESPONSE_MAX_SIZE)
 
         guard response.status == .ok else {
-            throw Mapper<CommonError>().map(JSONString: String(buffer: body)) ?? CommonError.unknownError(info: request.url)
+            throw Mapper<ClientError>().map(JSONString: String(buffer: body)) ?? ClientError.unexpectedError(info: request.url)
         }
 
         return Mapper<ResponseCandleData>().map(JSONString: String(buffer: body))
@@ -106,12 +106,12 @@ public class FugleClient {
 }
 
 extension FugleClient {
-    public func streamIntraday<T>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false, callback: ((Result<T, CommonError>) -> Void)?)  async throws -> EventLoopPromise<T>
+    public func streamIntraday<T>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false, callback: ((Result<T, ClientError>) -> Void)?) async throws -> EventLoopPromise<T>
         where T: MappableData {
         switch resource {
         case .dealts(_, _),
              .volumes:
-            throw CommonError.unsupportedEroor(info: resource.name)
+            throw ClientError.unsupportedEroor(info: resource.name)
         default:
             break
         }
@@ -119,17 +119,17 @@ extension FugleClient {
         let request = buildIntradayRequest(method: .WEB_SOCKET, resource: resource, symbol: symbol, oddLot: oddLot)
 
         let promise = self.eventLoopGroup.next().makePromise(of: type)
-        _ = WebSocket.connect(to: request.url, on: self.eventLoopGroup) { ws in
+        WebSocket.connect(to: request.url, on: self.eventLoopGroup) { ws in
             ws.onText { ws, json in
                 guard let result = Mapper<T>().map(JSONString: json) else {
-                    callback?(.failure(CommonError.jsonError(rawValue: json)))
+                    callback?(.failure(ClientError.jsonError(rawValue: json)))
                     return
                 }
                 guard let type = result.info?.type, type != "ODDLOT" else { return }
 
                 callback?(.success(result))
             }
-        }
+        }.cascadeFailure(to: promise)
 
         return promise
     }

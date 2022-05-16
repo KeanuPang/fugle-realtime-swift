@@ -1,5 +1,5 @@
 //
-//  CommonError.swift
+//  ClientError.swift
 //
 //
 //  Created by Keanu Pang on 2022/5/4.
@@ -7,7 +7,7 @@
 
 import ObjectMapper
 
-public class CommonError: MappableData, Error {
+public class ClientError: MappableData, Error {
     public var apiVersion: String?
     public var info: Info?
     public var error: ErrorDetails?
@@ -39,21 +39,21 @@ public class CommonError: MappableData, Error {
         }
     }
 
-    static func unknownError(info: String) -> CommonError {
-        return CommonError(error: ErrorDetails(message: "Unknown error occured by \(info)"))
+    static func unexpectedError(info: String) -> ClientError {
+        return ClientError(error: ErrorDetails(message: "Unexpected error occured by \(info)"))
     }
 
-    static func unsupportedEroor(info: String) -> CommonError {
-        return CommonError(error: ErrorDetails(message: "Unsupported operation: \(info)"))
+    static func unsupportedEroor(info: String) -> ClientError {
+        return ClientError(error: ErrorDetails(message: "Unsupported operation: \(info)"))
     }
 
-    static func jsonError(rawValue: String) -> CommonError {
-        return CommonError(error: ErrorDetails(message: "JSON parse failed: \(rawValue)"))
+    static func jsonError(rawValue: String) -> ClientError {
+        return ClientError(error: ErrorDetails(message: "JSON parse failed: \(rawValue)"))
     }
 }
 
 extension Error {
     func toString() -> String {
-        (self as? CommonError)?.toJSONString(prettyPrint: true) ?? self.localizedDescription
+        (self as? ClientError)?.toJSONString(prettyPrint: true) ?? self.localizedDescription
     }
 }
