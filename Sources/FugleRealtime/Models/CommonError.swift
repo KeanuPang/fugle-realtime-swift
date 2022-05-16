@@ -10,7 +10,7 @@ import ObjectMapper
 public class CommonError: MappableData, Error {
     public var apiVersion: String?
     public var info: Info?
-    var error: ErrorDetails?
+    public var error: ErrorDetails?
 
     public required init?(map: Map) {}
 
@@ -23,7 +23,7 @@ public class CommonError: MappableData, Error {
         error <- map["error"]
     }
 
-    class ErrorDetails: Mappable {
+    public class ErrorDetails: Mappable {
         var code: UInt32?
         var message: String?
 
@@ -31,9 +31,9 @@ public class CommonError: MappableData, Error {
             self.message = message
         }
 
-        required init?(map: Map) {}
+     public    required init?(map: Map) {}
 
-        func mapping(map: Map) {
+        public    func mapping(map: Map) {
             code <- map["code"]
             message <- map["message"]
         }

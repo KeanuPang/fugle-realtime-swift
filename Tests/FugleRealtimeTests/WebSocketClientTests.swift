@@ -23,10 +23,10 @@ final class WebSocketClientTests: XCTestCase {
         FugleClient.shared.shutdownWS()
     }
 
-    func testMetaRequestWS() throws {
+    func testMetaRequestWS() async throws {
         var promise: EventLoopPromise<ResponseMetaData>?
 
-        promise = try client.streamIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId, callback: {
+        promise = try await client.streamIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId, callback: {
             switch $0 {
             case .success(let result):
                 promise?.succeed(result)
@@ -44,10 +44,10 @@ final class WebSocketClientTests: XCTestCase {
         XCTAssertTrue(priceReference.decimalValue > 0)
     }
 
-    func testQuoteRequestWS() throws {
+    func testQuoteRequestWS() async throws {
         var promise: EventLoopPromise<ResponseQuoteData>?
 
-        promise = try client.streamIntraday(ResponseQuoteData.self, resource: .quote, symbol: symbolId, callback: {
+        promise = try await client.streamIntraday(ResponseQuoteData.self, resource: .quote, symbol: symbolId, callback: {
             switch $0 {
             case .success(let result):
                 promise?.succeed(result)
@@ -65,10 +65,10 @@ final class WebSocketClientTests: XCTestCase {
         XCTAssertTrue(quoteChange.decimalValue.isNormal)
     }
 
-    func testChartRequestWS() throws {
+    func testChartRequestWS() async throws {
         var promise: EventLoopPromise<ResponseChartData>?
 
-        promise = try client.streamIntraday(ResponseChartData.self, resource: .chart, symbol: symbolId, callback: {
+        promise = try await client.streamIntraday(ResponseChartData.self, resource: .chart, symbol: symbolId, callback: {
             switch $0 {
             case .success(let result):
                 promise?.succeed(result)
@@ -86,9 +86,11 @@ final class WebSocketClientTests: XCTestCase {
         XCTAssertTrue(volume.count > 0)
     }
 
-    func testDealtsRequestWS() throws {
-        XCTAssertThrowsError(
-            try client.streamIntraday(ResponseDealtsData.self, resource: .dealts(), symbol: symbolId, callback: nil)
-        )
+    func testDealtsRequestWS() async {
+        do {
+            _ = try await client.streamIntraday(ResponseDealtsData.self, resource: .dealts(), symbol: symbolId, callback: nil)
+        } catch {
+            XCTAssertNotNil(error)
+        }
     }
 }

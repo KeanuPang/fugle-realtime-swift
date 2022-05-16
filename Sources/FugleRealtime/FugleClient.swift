@@ -24,7 +24,6 @@ public class FugleClient {
         return shared
     }
 
-    private let logger = SharedLogger.getLogger("FugleClient")
     private let client: HTTPClient
     private var apiToken: String = ""
 
@@ -51,7 +50,6 @@ public class FugleClient {
         let response = try await client.execute(request, timeout: DEFAULT_REQUEST_TIMEOUT)
         let body = try await response.body.collect(upTo: DEFAULT_RESPONSE_MAX_SIZE)
 
-        dumpResponseData(body)
         guard response.status == .ok else {
             throw Mapper<CommonError>().map(JSONString: String(buffer: body)) ?? CommonError.unknownError(info: request.url)
         }
@@ -64,7 +62,6 @@ public class FugleClient {
         let response = try await client.execute(request, timeout: DEFAULT_REQUEST_TIMEOUT)
         let body = try await response.body.collect(upTo: DEFAULT_RESPONSE_MAX_SIZE)
 
-        dumpResponseData(body)
         guard response.status == .ok else {
             throw Mapper<CommonError>().map(JSONString: String(buffer: body)) ?? CommonError.unknownError(info: request.url)
         }
@@ -86,9 +83,7 @@ public class FugleClient {
         }
 
         parameters += resource.pagingParameters ?? ""
-        let request = HTTPClientRequest(url: "\(method.intraDayURL)/\(resource.name)?\(parameters)")
-        dumpRequest(request)
-        return request
+        return HTTPClientRequest(url: "\(method.intraDayURL)/\(resource.name)?\(parameters)")
     }
 
     private func buildMarketDataRequest(symbol: String, from: String, to: String) -> HTTPClientRequest {
@@ -106,24 +101,12 @@ public class FugleClient {
             }
         }
 
-        let request = HTTPClientRequest(url: "\(ENDPOINT_METHOD.HTTP.marketDataURL)?\(parameters)")
-        dumpRequest(request)
-        return request
-    }
-
-    private func dumpRequest(_ request: HTTPClientRequest) {
-        guard logger.logLevel == .debug else { return }
-        logger.debug("\(request.url)")
-    }
-
-    private func dumpResponseData(_ body: ByteBuffer) {
-        guard logger.logLevel == .debug else { return }
-        logger.debug("\(String(buffer: body))")
+        return HTTPClientRequest(url: "\(ENDPOINT_METHOD.HTTP.marketDataURL)?\(parameters)")
     }
 }
 
 extension FugleClient {
-    public func streamIntraday<T>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false, callback: ((Result<T, CommonError>) -> Void)?) throws -> EventLoopPromise<T>
+    public func streamIntraday<T>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false, callback: ((Result<T, CommonError>) -> Void)?)  async throws -> EventLoopPromise<T>
         where T: MappableData {
         switch resource {
         case .dealts(_, _),

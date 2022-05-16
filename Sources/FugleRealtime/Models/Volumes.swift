@@ -9,7 +9,7 @@ import Foundation
 import ObjectMapper
 
 public class ResponseVolumesData: MappableDataClass {
-    var volumes = [Volumes]()
+    public var volumes = [Volumes]()
 
     override public func mapping(map: Map) {
         super.mapping(map: map)
@@ -19,8 +19,8 @@ public class ResponseVolumesData: MappableDataClass {
 }
 
 public class Volumes: Mappable {
-    var price: NSDecimalNumber?
-    var volume: UInt64?
+    public var price: NSDecimalNumber?
+    public var volume: UInt64?
 
     public required init?(map: Map) {}
 

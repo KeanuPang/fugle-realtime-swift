@@ -9,7 +9,7 @@ import Foundation
 import ObjectMapper
 
 public class ResponseChartData: MappableDataClass {
-    var chart: Chart?
+    public var chart: Chart?
 
     override public func mapping(map: Map) {
         super.mapping(map: map)
@@ -19,13 +19,13 @@ public class ResponseChartData: MappableDataClass {
 }
 
 public class Chart: Mappable {
-    var a = [NSDecimalNumber]()
-    var o = [NSDecimalNumber]()
-    var h = [NSDecimalNumber]()
-    var l = [NSDecimalNumber]()
-    var c = [NSDecimalNumber]()
-    var v = [UInt64]()
-    var t = [UInt64]()
+    public var a = [NSDecimalNumber]()
+    public var o = [NSDecimalNumber]()
+    public var h = [NSDecimalNumber]()
+    public var l = [NSDecimalNumber]()
+    public var c = [NSDecimalNumber]()
+    public var v = [UInt64]()
+    public var t = [UInt64]()
 
     public required init?(map: Map) {}
 

@@ -13,7 +13,7 @@ public protocol MappableData: Mappable {
     var info: Info? { get set }
 }
 
-public class MappableDataClass: MappableData {
+open class MappableDataClass: MappableData {
     public var apiVersion: String?
     public var info: Info?
 
@@ -26,14 +26,14 @@ public class MappableDataClass: MappableData {
 }
 
 public class Info: MappableDataClass {
-    var date: String = ""
-    var type: String = ""
-    var exchange: String = ""
-    var market: String = ""
-    var symbolId: String = ""
-    var countryCode: String = ""
-    var timeZone: String = ""
-    var lastUpdatedAt: String?
+    public var date: String = ""
+    public var type: String = ""
+    public var exchange: String = ""
+    public var market: String = ""
+    public var symbolId: String = ""
+    public var countryCode: String = ""
+    public var timeZone: String = ""
+    public var lastUpdatedAt: String?
 
     override public func mapping(map: Map) {
         super.mapping(map: map)

@@ -9,12 +9,12 @@ import Foundation
 import ObjectMapper
 
 public class ResponseCandleData: Mappable {
-    var symbolId: String?
-    var type: String?
-    var exchange: String?
-    var market: String?
+    public var symbolId: String?
+    public var type: String?
+    public var exchange: String?
+    public var market: String?
 
-    var candles = [CandleData]()
+    public var candles = [CandleData]()
 
     public required init?(map: Map) {}
 
@@ -28,12 +28,12 @@ public class ResponseCandleData: Mappable {
 }
 
 public class CandleData: Mappable {
-    var date: String?
-    var open: NSDecimalNumber?
-    var high: NSDecimalNumber?
-    var low: NSDecimalNumber?
-    var close: NSDecimalNumber?
-    var volume: UInt64?
+    public var date: String?
+    public var open: NSDecimalNumber?
+    public var high: NSDecimalNumber?
+    public var low: NSDecimalNumber?
+    public var close: NSDecimalNumber?
+    public var volume: UInt64?
 
     public required init?(map: Map) {}
 

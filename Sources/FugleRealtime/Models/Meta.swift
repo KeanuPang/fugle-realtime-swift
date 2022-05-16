@@ -8,8 +8,8 @@
 import Foundation
 import ObjectMapper
 
-public class ResponseMetaData: MappableDataClass {
-    var meta: Meta?
+open class ResponseMetaData: MappableDataClass {
+    public var meta: Meta?
 
     override public func mapping(map: Map) {
         super.mapping(map: map)
@@ -18,24 +18,24 @@ public class ResponseMetaData: MappableDataClass {
     }
 }
 
-public class Meta: Mappable {
-    var market: String?
-    var nameZhTw: String?
-    var industryZhTw: String?
-    var priceReference: NSDecimalNumber?
-    var priceHighLimit: NSDecimalNumber?
-    var priceLowLimit: NSDecimalNumber?
-    var canDayBuySell: Bool?
-    var canDaySellBuy: Bool?
-    var canShortMargin: Bool?
-    var canShortLend: Bool?
-    var tradingUnit: UInt64?
-    var currency: String?
-    var isTerminated: Bool?
-    var isSuspended: Bool?
-    var typeZhTw: String?
-    var abnormal: String?
-    var isUnusuallyRecommended: Bool?
+open class Meta: Mappable {
+    public var market: String?
+    public var nameZhTw: String?
+    public var industryZhTw: String?
+    public var priceReference: NSDecimalNumber?
+    public var priceHighLimit: NSDecimalNumber?
+    public var priceLowLimit: NSDecimalNumber?
+    public var canDayBuySell: Bool?
+    public var canDaySellBuy: Bool?
+    public var canShortMargin: Bool?
+    public var canShortLend: Bool?
+    public var tradingUnit: UInt64?
+    public var currency: String?
+    public var isTerminated: Bool?
+    public var isSuspended: Bool?
+    public var typeZhTw: String?
+    public var abnormal: String?
+    public var isUnusuallyRecommended: Bool?
 
     public required init?(map: Map) {}
 

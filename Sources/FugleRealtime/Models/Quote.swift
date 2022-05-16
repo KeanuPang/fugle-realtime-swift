@@ -9,7 +9,7 @@ import Foundation
 import ObjectMapper
 
 public class ResponseQuoteData: MappableDataClass {
-    var quote: Quote?
+    public var quote: Quote?
 
     override public func mapping(map: Map) {
         super.mapping(map: map)
@@ -19,30 +19,30 @@ public class ResponseQuoteData: MappableDataClass {
 }
 
 public class Quote: Mappable {
-    var isCurbing: Bool?
-    var isCurbingFall: Bool?
-    var isCurbingRise: Bool?
-    var isTrial: Bool?
-    var isDealt: Bool?
-    var isOpenDelayed: Bool?
-    var isCloseDelayed: Bool?
-    var isHalting: Bool?
-    var isClosed: Bool?
+    public var isCurbing: Bool?
+    public var isCurbingFall: Bool?
+    public var isCurbingRise: Bool?
+    public var isTrial: Bool?
+    public var isDealt: Bool?
+    public var isOpenDelayed: Bool?
+    public var isCloseDelayed: Bool?
+    public var isHalting: Bool?
+    public var isClosed: Bool?
 
-    var total: QuoteTotal?
-    var trial: QuoteTrial?
-    var trade: QuoteTrade?
-    var order: QuoteOrder?
+    public var total: QuoteTotal?
+    public var trial: QuoteTrial?
+    public var trade: QuoteTrade?
+    public var order: QuoteOrder?
 
-    var priceHigh: QuotePrice?
-    var priceLow: QuotePrice?
-    var priceOpen: QuotePrice?
-    var priceAvg: QuotePrice?
+    public var priceHigh: QuotePrice?
+    public var priceLow: QuotePrice?
+    public var priceOpen: QuotePrice?
+    public var priceAvg: QuotePrice?
 
-    var change: NSDecimalNumber?
-    var changePercent: NSDecimalNumber?
-    var amplitude: NSDecimalNumber?
-    var priceLimit: UInt8?
+    public var change: NSDecimalNumber?
+    public var changePercent: NSDecimalNumber?
+    public var amplitude: NSDecimalNumber?
+    public var priceLimit: UInt8?
 
     public required init?(map: Map) {}
 
@@ -70,22 +70,22 @@ public class Quote: Mappable {
         priceLimit <- map["priceLimit"]
     }
 
-    class QuoteTotal: Mappable {
-        var at: String?
-        var transaction: UInt64?
-        var tradeValue: NSDecimalNumber?
-        var tradeVolume: UInt64?
-        var tradeVolumeAtBid: UInt64?
-        var tradeVolumeAtAsk: UInt64?
-        var bidOrders: UInt64?
-        var askOrders: UInt64?
-        var bidVolume: UInt64?
-        var askVolume: UInt64?
-        var serial: UInt64?
+    public class QuoteTotal: Mappable {
+        public var at: String?
+        public var transaction: UInt64?
+        public var tradeValue: NSDecimalNumber?
+        public var tradeVolume: UInt64?
+        public var tradeVolumeAtBid: UInt64?
+        public var tradeVolumeAtAsk: UInt64?
+        public var bidOrders: UInt64?
+        public var askOrders: UInt64?
+        public var bidVolume: UInt64?
+        public var askVolume: UInt64?
+        public var serial: UInt64?
 
-        required init?(map: Map) {}
+        public required init?(map: Map) {}
 
-        func mapping(map: Map) {
+        public func mapping(map: Map) {
             at <- map["at"]
             transaction <- map["transaction"]
             tradeValue <- (map["tradeValue"], NSDecimalNumberTransform())
@@ -100,16 +100,16 @@ public class Quote: Mappable {
         }
     }
 
-    class QuoteTrial: Mappable {
-        var at: String?
-        var bid: NSDecimalNumber?
-        var ask: NSDecimalNumber?
-        var price: NSDecimalNumber?
-        var volume: UInt64?
+    public class QuoteTrial: Mappable {
+        public var at: String?
+        public var bid: NSDecimalNumber?
+        public var ask: NSDecimalNumber?
+        public var price: NSDecimalNumber?
+        public var volume: UInt64?
 
-        required init?(map: Map) {}
+        public required init?(map: Map) {}
 
-        func mapping(map: Map) {
+        public func mapping(map: Map) {
             at <- map["at"]
             bid <- (map["bid"], NSDecimalNumberTransform())
             ask <- (map["ask"], NSDecimalNumberTransform())
@@ -118,17 +118,17 @@ public class Quote: Mappable {
         }
     }
 
-    class QuoteTrade: Mappable {
-        var at: String?
-        var bid: NSDecimalNumber?
-        var ask: NSDecimalNumber?
-        var price: NSDecimalNumber?
-        var volume: UInt64?
-        var serial: UInt64?
+    public class QuoteTrade: Mappable {
+        public var at: String?
+        public var bid: NSDecimalNumber?
+        public var ask: NSDecimalNumber?
+        public var price: NSDecimalNumber?
+        public var volume: UInt64?
+        public var serial: UInt64?
 
-        required init?(map: Map) {}
+        public required init?(map: Map) {}
 
-        func mapping(map: Map) {
+        public func mapping(map: Map) {
             at <- map["at"]
             bid <- (map["bid"], NSDecimalNumberTransform())
             ask <- (map["ask"], NSDecimalNumberTransform())
@@ -138,27 +138,27 @@ public class Quote: Mappable {
         }
     }
 
-    class QuoteOrder: Mappable {
-        var at: String?
-        var bids = [Volumes]()
-        var asks = [Volumes]()
+    public class QuoteOrder: Mappable {
+        public var at: String?
+        public var bids = [Volumes]()
+        public var asks = [Volumes]()
 
-        required init?(map: Map) {}
+        public required init?(map: Map) {}
 
-        func mapping(map: Map) {
+        public func mapping(map: Map) {
             at <- map["at"]
             bids <- map["bids"]
             asks <- map["asks"]
         }
     }
 
-    class QuotePrice: Mappable {
-        var price: NSDecimalNumber?
-        var at: String?
+    public class QuotePrice: Mappable {
+        public var price: NSDecimalNumber?
+        public var at: String?
 
-        required init?(map: Map) {}
+        public required init?(map: Map) {}
 
-        func mapping(map: Map) {
+        public func mapping(map: Map) {
             price <- (map["price"], NSDecimalNumberTransform())
             at <- map["at"]
         }
