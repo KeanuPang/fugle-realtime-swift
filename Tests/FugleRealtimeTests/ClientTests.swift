@@ -90,7 +90,6 @@ final class ClientTests: XCTestCase {
     func testMarketRequest() async throws {
         do {
             let response: ResponseCandleData? = try await client.getMarketData(symbol: symbolId,
-                                                                               apiToken: apiToken,
                                                                                from: "2022-04-25",
                                                                                to: "2022-04-29")
 

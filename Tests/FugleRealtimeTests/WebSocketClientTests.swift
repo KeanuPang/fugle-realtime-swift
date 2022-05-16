@@ -27,24 +27,24 @@ final class WebSocketClientTests: XCTestCase {
         client = FugleClient.initWithApiToken("")
 
         do {
-            var promise: EventLoopPromise<ResponseMetaData>?
+            var promise: EventLoopPromise<Void>?
             promise = try await client.streamIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId, callback: nil)
 
-            _ = try promise?.futureResult.wait()
+            try promise?.futureResult.wait()
             XCTFail()
         } catch {
             XCTAssertNotNil(error)
         }
     }
-    
+
     func testInvalidToken() async throws {
         client = FugleClient.initWithApiToken("abcdefghijklmn")
 
         do {
-            var promise: EventLoopPromise<ResponseMetaData>?
+            var promise: EventLoopPromise<Void>?
             promise = try await client.streamIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId, callback: nil)
 
-            _ = try promise?.futureResult.wait()
+            try promise?.futureResult.wait()
             XCTFail()
         } catch {
             XCTAssertNotNil(error)
@@ -52,18 +52,19 @@ final class WebSocketClientTests: XCTestCase {
     }
 
     func testMetaRequestWS() async throws {
-        var promise: EventLoopPromise<ResponseMetaData>?
-
+        var response: ResponseMetaData?
+        var promise: EventLoopPromise<Void>?
         promise = try await client.streamIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId, callback: {
             switch $0 {
             case .success(let result):
-                promise?.succeed(result)
+                response = result
+                promise?.succeed(())
             case .failure(let failures):
                 XCTFail(failures.toString())
             }
         })
 
-        let response = try promise?.futureResult.wait()
+        try promise?.futureResult.wait()
 
         let info = (try XCTUnwrap(response?.info))
         let priceReference = (try XCTUnwrap(response?.meta?.priceReference))
@@ -73,18 +74,19 @@ final class WebSocketClientTests: XCTestCase {
     }
 
     func testQuoteRequestWS() async throws {
-        var promise: EventLoopPromise<ResponseQuoteData>?
-
+        var response: ResponseQuoteData?
+        var promise: EventLoopPromise<Void>?
         promise = try await client.streamIntraday(ResponseQuoteData.self, resource: .quote, symbol: symbolId, callback: {
             switch $0 {
             case .success(let result):
-                promise?.succeed(result)
+                response = result
+                promise?.succeed(())
             case .failure(let failures):
                 XCTFail(failures.toString())
             }
         })
 
-        let response = try promise?.futureResult.wait()
+        try promise?.futureResult.wait()
 
         let info = (try XCTUnwrap(response?.info))
         let quoteChange = (try XCTUnwrap(response?.quote?.change))
@@ -94,18 +96,19 @@ final class WebSocketClientTests: XCTestCase {
     }
 
     func testChartRequestWS() async throws {
-        var promise: EventLoopPromise<ResponseChartData>?
-
+        var response: ResponseChartData?
+        var promise: EventLoopPromise<Void>?
         promise = try await client.streamIntraday(ResponseChartData.self, resource: .chart, symbol: symbolId, callback: {
             switch $0 {
             case .success(let result):
-                promise?.succeed(result)
+                response = result
+                promise?.succeed(())
             case .failure(let failures):
                 XCTFail(failures.toString())
             }
         })
 
-        let response = try promise?.futureResult.wait()
+        try promise?.futureResult.wait()
 
         let info = (try XCTUnwrap(response?.info))
         let volume = (try XCTUnwrap(response?.chart?.v))

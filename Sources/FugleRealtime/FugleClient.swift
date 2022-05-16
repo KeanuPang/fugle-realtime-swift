@@ -19,13 +19,11 @@ public class FugleClient {
     public static let shared = FugleClient()
 
     public static func initWithApiToken(_ token: String) -> FugleClient {
-        let shared = FugleClient.shared
-        shared.apiToken = token
-        return shared
+        ClientConfig.setApiToken(token)
+        return FugleClient.shared
     }
 
     private let client: HTTPClient
-    private var apiToken: String = ""
 
     private(set) var eventLoopGroup: EventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
 
@@ -33,22 +31,18 @@ public class FugleClient {
         self.client = HTTPClient(eventLoopGroupProvider: .createNew)
     }
 
-    public func setupApiToken(_ token: String) {
-        self.apiToken = token
-    }
-
     public func shutdown() {
         try? self.client.syncShutdown()
     }
 
     public func shutdownWS() {
-        try? self.eventLoopGroup.syncShutdownGracefully()
+        try? self.eventLoopGroup.next().syncShutdownGracefully()
     }
 
     public func getIntraday<T>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false) async throws -> T? where T: MappableData {
         let request = buildIntradayRequest(method: .HTTP, resource: resource, symbol: symbol, oddLot: oddLot)
-        let response = try await client.execute(request, timeout: DEFAULT_REQUEST_TIMEOUT)
-        let body = try await response.body.collect(upTo: DEFAULT_RESPONSE_MAX_SIZE)
+        let response = try await client.execute(request, timeout: ClientConfig.requestTimeout)
+        let body = try await response.body.collect(upTo: ClientConfig.responseMaxSize)
 
         guard response.status == .ok else {
             throw Mapper<ClientError>().map(JSONString: String(buffer: body)) ?? ClientError.unexpectedError(info: request.url)
@@ -57,10 +51,10 @@ public class FugleClient {
         return Mapper<T>().map(JSONString: String(buffer: body))
     }
 
-    public func getMarketData(symbol: String, apiToken: String, from: String, to: String) async throws -> ResponseCandleData? {
+    public func getMarketData(symbol: String, from: String, to: String) async throws -> ResponseCandleData? {
         let request = buildMarketDataRequest(symbol: symbol, from: from, to: to)
-        let response = try await client.execute(request, timeout: DEFAULT_REQUEST_TIMEOUT)
-        let body = try await response.body.collect(upTo: DEFAULT_RESPONSE_MAX_SIZE)
+        let response = try await client.execute(request, timeout: ClientConfig.requestTimeout)
+        let body = try await response.body.collect(upTo: ClientConfig.responseMaxSize)
 
         guard response.status == .ok else {
             throw Mapper<ClientError>().map(JSONString: String(buffer: body)) ?? ClientError.unexpectedError(info: request.url)
@@ -74,7 +68,7 @@ public class FugleClient {
         IntradayParameters.allCases.forEach {
             switch $0 {
             case .apiToken:
-                parameters += "\($0.rawValue)=\(self.apiToken)&"
+                parameters += "\($0.rawValue)=\(ClientConfig.getApiToken())&"
             case .symbolId:
                 parameters += "\($0.rawValue)=\(symbol)&"
             case .oddLot:
@@ -91,7 +85,7 @@ public class FugleClient {
         CandleParameters.allCases.forEach {
             switch $0 {
             case .apiToken:
-                parameters += "\($0.rawValue)=\(apiToken)&"
+                parameters += "\($0.rawValue)=\(ClientConfig.getApiToken())&"
             case .symbolId:
                 parameters += "\($0.rawValue)=\(symbol)&"
             case .from:
@@ -106,7 +100,7 @@ public class FugleClient {
 }
 
 extension FugleClient {
-    public func streamIntraday<T>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false, callback: ((Result<T, ClientError>) -> Void)?) async throws -> EventLoopPromise<T>
+    public func streamIntraday<T>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false, callback: ((Result<T, ClientError>) -> Void)?) async throws -> EventLoopPromise<Void>
         where T: MappableData {
         switch resource {
         case .dealts(_, _),
@@ -118,7 +112,7 @@ extension FugleClient {
 
         let request = buildIntradayRequest(method: .WEB_SOCKET, resource: resource, symbol: symbol, oddLot: oddLot)
 
-        let promise = self.eventLoopGroup.next().makePromise(of: type)
+        let promise = self.eventLoopGroup.next().makePromise(of: Void.self)
         WebSocket.connect(to: request.url, on: self.eventLoopGroup) { ws in
             ws.onText { ws, json in
                 guard let result = Mapper<T>().map(JSONString: json) else {
@@ -129,6 +123,7 @@ extension FugleClient {
 
                 callback?(.success(result))
             }
+            ws.onClose.cascade(to: promise)
         }.cascadeFailure(to: promise)
 
         return promise

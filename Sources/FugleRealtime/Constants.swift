@@ -24,9 +24,6 @@ enum ENDPOINT_METHOD: String {
     }
 }
 
-let DEFAULT_REQUEST_TIMEOUT: TimeAmount = .seconds(30)
-let DEFAULT_RESPONSE_MAX_SIZE = 1024 * 1024 * 3 // 3 MB
-
 public typealias PAGING_LIMIT = UInt
 public typealias PAGING_OFFSET = UInt
 
