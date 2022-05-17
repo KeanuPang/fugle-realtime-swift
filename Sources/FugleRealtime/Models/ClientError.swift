@@ -7,6 +7,20 @@
 
 import ObjectMapper
 
+public enum ClientErrorCode: String {
+    case invalidTokenOrUrl
+    case unexpectedError
+
+    func toError(_ info: String) -> ClientError {
+        switch self {
+        case .invalidTokenOrUrl:
+            return ClientError.unexpectedError(code: self.rawValue, info: info)
+        case .unexpectedError:
+            return ClientError.unexpectedError(code: self.rawValue, info: info)
+        }
+    }
+}
+
 public class ClientError: MappableData, Error {
     public var apiVersion: String?
     public var info: Info?
@@ -24,23 +38,29 @@ public class ClientError: MappableData, Error {
     }
 
     public class ErrorDetails: Mappable {
-        var code: UInt32?
-        var message: String?
+        public var code: String?
+        public var codeNumber: UInt32?
+        public var message: String?
 
-        init(message: String) {
+        init(code: String? = nil, message: String) {
+            self.code = code
             self.message = message
         }
 
         public required init?(map: Map) {}
 
         public func mapping(map: Map) {
-            code <- map["code"]
+            codeNumber <- map["code"]
             message <- map["message"]
+
+            if let number = codeNumber {
+                code = "\(number)"
+            }
         }
     }
 
-    static func unexpectedError(info: String) -> ClientError {
-        return ClientError(error: ErrorDetails(message: "Unexpected error occured by \(info)"))
+    static func unexpectedError(code: String? = nil, info: String) -> ClientError {
+        return ClientError(error: ErrorDetails(code: code, message: "Unexpected error occured by \(info)"))
     }
 
     static func unsupportedEroor(info: String) -> ClientError {

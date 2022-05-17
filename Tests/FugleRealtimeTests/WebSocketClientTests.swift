@@ -24,31 +24,43 @@ final class WebSocketClientTests: XCTestCase {
     }
 
     func testUnauthorizedRequest() async throws {
+        var errorResponse: ClientError?
         client = FugleClient.initWithApiToken("")
 
-        do {
-            var promise: EventLoopPromise<Void>?
-            promise = try await client.streamIntraday(MetaData.self, symbol: symbolId, callback: nil)
+        var promise: EventLoopPromise<Void>?
+        promise = try await client.streamIntraday(MetaData.self, symbol: symbolId, callback: {
+            switch $0 {
+            case .success:
+                XCTFail()
+            case .failure(let failures):
+                errorResponse = failures
+            }
+            promise?.succeed(())
+        })
 
-            try promise?.futureResult.wait()
-            XCTFail()
-        } catch {
-            XCTAssertNotNil(error)
-        }
+        try promise?.futureResult.wait()
+
+        XCTAssertNotNil(errorResponse)
+        XCTAssertEqual(ClientErrorCode.invalidTokenOrUrl.rawValue, try XCTUnwrap(errorResponse?.error?.code))
     }
 
     func testInvalidToken() async throws {
+        var errorResponse: ClientError?
         client = FugleClient.initWithApiToken("abcdefghijklmn")
 
-        do {
-            var promise: EventLoopPromise<Void>?
-            promise = try await client.streamIntraday(MetaData.self, symbol: symbolId, callback: nil)
+        var promise: EventLoopPromise<Void>?
+        promise = try await client.streamIntraday(MetaData.self, symbol: symbolId, callback: {
+            switch $0 {
+            case .success:
+                XCTFail()
+            case .failure(let failures):
+                errorResponse = failures
+            }
+            promise?.succeed(())
+        })
 
-            try promise?.futureResult.wait()
-            XCTFail()
-        } catch {
-            XCTAssertNotNil(error)
-        }
+        try promise?.futureResult.wait()
+        XCTAssertNotNil(errorResponse)
     }
 
     func testMetaRequestWS() async throws {
@@ -58,10 +70,10 @@ final class WebSocketClientTests: XCTestCase {
             switch $0 {
             case .success(let result):
                 response = result
-                promise?.succeed(())
             case .failure(let failures):
                 XCTFail(failures.toString())
             }
+            promise?.succeed(())
         })
 
         try promise?.futureResult.wait()
@@ -80,10 +92,10 @@ final class WebSocketClientTests: XCTestCase {
             switch $0 {
             case .success(let result):
                 response = result
-                promise?.succeed(())
             case .failure(let failures):
                 XCTFail(failures.toString())
             }
+            promise?.succeed(())
         })
 
         try promise?.futureResult.wait()
@@ -102,10 +114,10 @@ final class WebSocketClientTests: XCTestCase {
             switch $0 {
             case .success(let result):
                 response = result
-                promise?.succeed(())
             case .failure(let failures):
                 XCTFail(failures.toString())
             }
+            promise?.succeed(())
         })
 
         try promise?.futureResult.wait()

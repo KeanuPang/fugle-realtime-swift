@@ -134,6 +134,16 @@ extension FugleClient {
                 callback?(.success(result))
             }
             ws.onClose.cascade(to: promise)
+        }.flatMapError { [weak self] in
+            self?.logger.error($0.toString())
+
+            if $0 is WebSocketClient.Error {
+                callback?(.failure(ClientErrorCode.invalidTokenOrUrl.toError($0.toString())))
+            } else {
+                callback?(.failure(ClientErrorCode.unexpectedError.toError($0.toString())))
+            }
+
+            return promise.futureResult
         }.cascadeFailure(to: promise)
 
         return promise

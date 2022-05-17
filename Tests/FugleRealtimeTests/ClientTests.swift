@@ -23,7 +23,7 @@ final class ClientTests: XCTestCase {
             XCTFail("API Should not be called due to invalid token")
         } catch {
             XCTAssertTrue(error is ClientError)
-            XCTAssertEqual(401, try XCTUnwrap((error as? ClientError)?.error?.code))
+            XCTAssertEqual("401", try XCTUnwrap((error as? ClientError)?.error?.code))
         }
     }
 
@@ -35,7 +35,7 @@ final class ClientTests: XCTestCase {
             XCTFail("API Should not be called due to invalid token")
         } catch {
             XCTAssertTrue(error is ClientError)
-            XCTAssertEqual(400, try XCTUnwrap((error as? ClientError)?.error?.code))
+            XCTAssertEqual("400", try XCTUnwrap((error as? ClientError)?.error?.code))
         }
     }
 
