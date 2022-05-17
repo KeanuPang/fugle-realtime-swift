@@ -20,6 +20,7 @@ final class ClientTests: XCTestCase {
 
         do {
             _ = try await client.getIntraday(MetaData.self, symbol: symbolId)
+            XCTFail("API Should not be called due to invalid token")
         } catch {
             XCTAssertTrue(error is ClientError)
             XCTAssertEqual(401, try XCTUnwrap((error as? ClientError)?.error?.code))
@@ -31,6 +32,7 @@ final class ClientTests: XCTestCase {
 
         do {
             _ = try await client.getIntraday(MetaData.self, symbol: symbolId)
+            XCTFail("API Should not be called due to invalid token")
         } catch {
             XCTAssertTrue(error is ClientError)
             XCTAssertEqual(400, try XCTUnwrap((error as? ClientError)?.error?.code))
@@ -90,8 +92,8 @@ final class ClientTests: XCTestCase {
     func testMarketRequest() async throws {
         do {
             let response: CandleData? = try await client.getMarketData(symbol: symbolId,
-                                                                               from: "2022-04-25",
-                                                                               to: "2022-04-29")
+                                                                       from: "2022-04-25",
+                                                                       to: "2022-04-29")
 
             XCTAssertEqual(symbolId, try XCTUnwrap(response?.symbolId))
         } catch {
