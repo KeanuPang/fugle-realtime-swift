@@ -13,6 +13,10 @@ public protocol MappableData: Mappable {
     var info: Info? { get set }
 }
 
+public protocol ResourceType: MappableData {
+    static var resource: IntradayResource { get }
+}
+
 open class MappableDataClass: MappableData {
     public var apiVersion: String?
     public var info: Info?

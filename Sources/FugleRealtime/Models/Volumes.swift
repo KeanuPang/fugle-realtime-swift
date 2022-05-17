@@ -8,8 +8,12 @@
 import Foundation
 import ObjectMapper
 
-public class ResponseVolumesData: MappableDataClass {
+public class VolumesData: MappableDataClass, ResourceType {
     public var volumes = [Volumes]()
+
+    public static var resource: IntradayResource {
+        return .volumes
+    }
 
     override public func mapping(map: Map) {
         super.mapping(map: map)

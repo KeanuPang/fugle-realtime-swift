@@ -8,8 +8,12 @@
 import Foundation
 import ObjectMapper
 
-open class ResponseMetaData: MappableDataClass {
+open class MetaData: MappableDataClass, ResourceType {
     public var meta: Meta?
+
+    public static var resource: IntradayResource {
+        return .meta
+    }
 
     override public func mapping(map: Map) {
         super.mapping(map: map)

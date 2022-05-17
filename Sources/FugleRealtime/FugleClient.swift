@@ -42,9 +42,9 @@ public class FugleClient {
         logger.info("shutdown websocket client")
     }
 
-    public func getIntraday<T>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false) async throws -> T? where T: MappableData {
-        logger.debug("get resource \(symbol): \(resource.name)")
-        let request = buildIntradayRequest(method: .HTTP, resource: resource, symbol: symbol, oddLot: oddLot)
+    public func getIntraday<T>(_ type: T.Type, symbol: String, oddLot: Bool = false) async throws -> T? where T: ResourceType {
+        logger.debug("get resource \(symbol): \(type.resource.name)")
+        let request = buildIntradayRequest(method: .HTTP, resource: type.resource, symbol: symbol, oddLot: oddLot)
         let response = try await client.execute(request, timeout: ClientConfig.requestTimeout)
         let body = try await response.body.collect(upTo: ClientConfig.responseMaxSize)
 
@@ -55,7 +55,7 @@ public class FugleClient {
         return Mapper<T>().map(JSONString: String(buffer: body))
     }
 
-    public func getMarketData(symbol: String, from: String, to: String) async throws -> ResponseCandleData? {
+    public func getMarketData(symbol: String, from: String, to: String) async throws -> CandleData? {
         logger.debug("get market data \(symbol): \(from), \(to)")
         let request = buildMarketDataRequest(symbol: symbol, from: from, to: to)
         let response = try await client.execute(request, timeout: ClientConfig.requestTimeout)
@@ -65,7 +65,7 @@ public class FugleClient {
             throw Mapper<ClientError>().map(JSONString: String(buffer: body)) ?? ClientError.unexpectedError(info: request.url)
         }
 
-        return Mapper<ResponseCandleData>().map(JSONString: String(buffer: body))
+        return Mapper<CandleData>().map(JSONString: String(buffer: body))
     }
 
     private func buildIntradayRequest(method: ENDPOINT_METHOD, resource: IntradayResource, symbol: String, oddLot: Bool = false) -> HTTPClientRequest {
@@ -105,8 +105,9 @@ public class FugleClient {
 }
 
 extension FugleClient {
-    public func streamIntraday<T>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false, callback: ((Result<T, ClientError>) -> Void)?) async throws -> EventLoopPromise<Void>
-        where T: MappableData {
+    public func streamIntraday<T>(_ type: T.Type, symbol: String, oddLot: Bool = false, callback: ((Result<T, ClientError>) -> Void)?) async throws -> EventLoopPromise<Void>
+        where T: ResourceType {
+        let resource: IntradayResource = type.resource
         switch resource {
         case .dealts(_, _),
              .volumes:

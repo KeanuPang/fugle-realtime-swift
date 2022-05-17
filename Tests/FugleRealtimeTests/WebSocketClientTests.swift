@@ -28,7 +28,7 @@ final class WebSocketClientTests: XCTestCase {
 
         do {
             var promise: EventLoopPromise<Void>?
-            promise = try await client.streamIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId, callback: nil)
+            promise = try await client.streamIntraday(MetaData.self, symbol: symbolId, callback: nil)
 
             try promise?.futureResult.wait()
             XCTFail()
@@ -42,7 +42,7 @@ final class WebSocketClientTests: XCTestCase {
 
         do {
             var promise: EventLoopPromise<Void>?
-            promise = try await client.streamIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId, callback: nil)
+            promise = try await client.streamIntraday(MetaData.self, symbol: symbolId, callback: nil)
 
             try promise?.futureResult.wait()
             XCTFail()
@@ -52,9 +52,9 @@ final class WebSocketClientTests: XCTestCase {
     }
 
     func testMetaRequestWS() async throws {
-        var response: ResponseMetaData?
+        var response: MetaData?
         var promise: EventLoopPromise<Void>?
-        promise = try await client.streamIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId, callback: {
+        promise = try await client.streamIntraday(MetaData.self, symbol: symbolId, callback: {
             switch $0 {
             case .success(let result):
                 response = result
@@ -74,9 +74,9 @@ final class WebSocketClientTests: XCTestCase {
     }
 
     func testQuoteRequestWS() async throws {
-        var response: ResponseQuoteData?
+        var response: QuoteData?
         var promise: EventLoopPromise<Void>?
-        promise = try await client.streamIntraday(ResponseQuoteData.self, resource: .quote, symbol: symbolId, callback: {
+        promise = try await client.streamIntraday(QuoteData.self, symbol: symbolId, callback: {
             switch $0 {
             case .success(let result):
                 response = result
@@ -96,9 +96,9 @@ final class WebSocketClientTests: XCTestCase {
     }
 
     func testChartRequestWS() async throws {
-        var response: ResponseChartData?
+        var response: ChartData?
         var promise: EventLoopPromise<Void>?
-        promise = try await client.streamIntraday(ResponseChartData.self, resource: .chart, symbol: symbolId, callback: {
+        promise = try await client.streamIntraday(ChartData.self, symbol: symbolId, callback: {
             switch $0 {
             case .success(let result):
                 response = result
@@ -119,7 +119,7 @@ final class WebSocketClientTests: XCTestCase {
 
     func testDealtsRequestWS() async {
         do {
-            _ = try await client.streamIntraday(ResponseDealtsData.self, resource: .dealts(), symbol: symbolId, callback: nil)
+            _ = try await client.streamIntraday(DealtsData.self, symbol: symbolId, callback: nil)
         } catch {
             XCTAssertNotNil(error)
         }

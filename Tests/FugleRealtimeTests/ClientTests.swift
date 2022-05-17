@@ -19,7 +19,7 @@ final class ClientTests: XCTestCase {
         client = FugleClient.initWithApiToken("")
 
         do {
-            _ = try await client.getIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId)
+            _ = try await client.getIntraday(MetaData.self, symbol: symbolId)
         } catch {
             XCTAssertTrue(error is ClientError)
             XCTAssertEqual(401, try XCTUnwrap((error as? ClientError)?.error?.code))
@@ -30,7 +30,7 @@ final class ClientTests: XCTestCase {
         client = FugleClient.initWithApiToken("abcdefghijklmn")
 
         do {
-            _ = try await client.getIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId)
+            _ = try await client.getIntraday(MetaData.self, symbol: symbolId)
         } catch {
             XCTAssertTrue(error is ClientError)
             XCTAssertEqual(400, try XCTUnwrap((error as? ClientError)?.error?.code))
@@ -39,7 +39,7 @@ final class ClientTests: XCTestCase {
 
     func testMetaRequest() async throws {
         do {
-            let response: ResponseMetaData? = try await client.getIntraday(ResponseMetaData.self, resource: .meta, symbol: symbolId)
+            let response: MetaData? = try await client.getIntraday(MetaData.self, symbol: symbolId)
 
             XCTAssertEqual(symbolId, try XCTUnwrap(response?.info?.symbolId))
         } catch {
@@ -49,7 +49,7 @@ final class ClientTests: XCTestCase {
 
     func testQuoteRequest() async throws {
         do {
-            let response: ResponseQuoteData? = try await client.getIntraday(ResponseQuoteData.self, resource: .quote, symbol: symbolId)
+            let response: QuoteData? = try await client.getIntraday(QuoteData.self, symbol: symbolId)
 
             XCTAssertEqual(symbolId, try XCTUnwrap(response?.info?.symbolId))
         } catch {
@@ -59,7 +59,7 @@ final class ClientTests: XCTestCase {
 
     func testChartRequest() async throws {
         do {
-            let response: ResponseChartData? = try await client.getIntraday(ResponseChartData.self, resource: .chart, symbol: symbolId)
+            let response: ChartData? = try await client.getIntraday(ChartData.self, symbol: symbolId)
 
             XCTAssertEqual(symbolId, try XCTUnwrap(response?.info?.symbolId))
         } catch {
@@ -69,7 +69,7 @@ final class ClientTests: XCTestCase {
 
     func testDealtsRequest() async throws {
         do {
-            let response: ResponseDealtsData? = try await client.getIntraday(ResponseDealtsData.self, resource: .dealts(), symbol: symbolId)
+            let response: DealtsData? = try await client.getIntraday(DealtsData.self, symbol: symbolId)
 
             XCTAssertEqual(symbolId, try XCTUnwrap(response?.info?.symbolId))
         } catch {
@@ -79,7 +79,7 @@ final class ClientTests: XCTestCase {
 
     func testVolumesRequest() async throws {
         do {
-            let response: ResponseVolumesData? = try await client.getIntraday(ResponseVolumesData.self, resource: .volumes, symbol: symbolId)
+            let response: VolumesData? = try await client.getIntraday(VolumesData.self, symbol: symbolId)
 
             XCTAssertEqual(symbolId, try XCTUnwrap(response?.info?.symbolId))
         } catch {
@@ -89,7 +89,7 @@ final class ClientTests: XCTestCase {
 
     func testMarketRequest() async throws {
         do {
-            let response: ResponseCandleData? = try await client.getMarketData(symbol: symbolId,
+            let response: CandleData? = try await client.getMarketData(symbol: symbolId,
                                                                                from: "2022-04-25",
                                                                                to: "2022-04-29")
 

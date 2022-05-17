@@ -8,13 +8,13 @@
 import Foundation
 import ObjectMapper
 
-public class ResponseCandleData: Mappable {
+public class CandleData: Mappable {
     public var symbolId: String?
     public var type: String?
     public var exchange: String?
     public var market: String?
 
-    public var candles = [CandleData]()
+    public var candles = [CandleDetails]()
 
     public required init?(map: Map) {}
 
@@ -27,7 +27,7 @@ public class ResponseCandleData: Mappable {
     }
 }
 
-public class CandleData: Mappable {
+public class CandleDetails: Mappable {
     public var date: String?
     public var open: NSDecimalNumber?
     public var high: NSDecimalNumber?

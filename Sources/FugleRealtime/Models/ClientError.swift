@@ -31,9 +31,9 @@ public class ClientError: MappableData, Error {
             self.message = message
         }
 
-     public    required init?(map: Map) {}
+        public required init?(map: Map) {}
 
-        public    func mapping(map: Map) {
+        public func mapping(map: Map) {
             code <- map["code"]
             message <- map["message"]
         }
