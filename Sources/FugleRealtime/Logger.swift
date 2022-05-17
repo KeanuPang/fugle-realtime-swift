@@ -18,10 +18,6 @@ protocol Logging: Sendable {
 struct Logger: Logging {
     let category: String
 
-    private var isDisabled: Bool {
-        return env.getAsBool("DISABLE_LOGGER") ?? false
-    }
-
     init(category: String) {
         self.category = category
     }
@@ -47,7 +43,7 @@ struct Logger: Logging {
     }
 
     private func log(level: String, message: String) {
-        guard isDisabled == false else { return }
+        guard ClientConfig.loggerDisabled() == false else { return }
         Swift.print("[\(category)] \(level): \(message)")
     }
 }

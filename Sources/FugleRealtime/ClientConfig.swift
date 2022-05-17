@@ -13,6 +13,8 @@ enum DefaultEnvironment: String {
     case REQUEST_TIMEOUT
     case DEALTS_PAGE_LIMIT
 
+    case DISABLE_LOGGER
+
     var value: String? {
         env.get(self.rawValue)
     }
@@ -50,5 +52,9 @@ public struct ClientConfig {
         }
 
         return token
+    }
+
+    static func loggerDisabled() -> Bool {
+        return env.getAsBool(DefaultEnvironment.DISABLE_LOGGER.rawValue) ?? false
     }
 }
