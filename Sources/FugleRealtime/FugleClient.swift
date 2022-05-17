@@ -24,6 +24,7 @@ public class FugleClient {
     }
 
     private let client: HTTPClient
+    private let logger: Logger = Logger.defaultLogger(category: "FugleClient")
 
     private(set) var eventLoopGroup: EventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
 
@@ -33,13 +34,16 @@ public class FugleClient {
 
     public func shutdown() {
         try? self.client.syncShutdown()
+        logger.info("shutdown client")
     }
 
     public func shutdownWS() {
         try? self.eventLoopGroup.next().syncShutdownGracefully()
+        logger.info("shutdown websocket client")
     }
 
     public func getIntraday<T>(_ type: T.Type, resource: IntradayResource, symbol: String, oddLot: Bool = false) async throws -> T? where T: MappableData {
+        logger.debug("get resource \(symbol): \(resource.name)")
         let request = buildIntradayRequest(method: .HTTP, resource: resource, symbol: symbol, oddLot: oddLot)
         let response = try await client.execute(request, timeout: ClientConfig.requestTimeout)
         let body = try await response.body.collect(upTo: ClientConfig.responseMaxSize)
@@ -52,6 +56,7 @@ public class FugleClient {
     }
 
     public func getMarketData(symbol: String, from: String, to: String) async throws -> ResponseCandleData? {
+        logger.debug("get market data \(symbol): \(from), \(to)")
         let request = buildMarketDataRequest(symbol: symbol, from: from, to: to)
         let response = try await client.execute(request, timeout: ClientConfig.requestTimeout)
         let body = try await response.body.collect(upTo: ClientConfig.responseMaxSize)
@@ -110,11 +115,15 @@ extension FugleClient {
             break
         }
 
+        logger.debug("get websocket resource \(symbol): \(resource.name)")
+
         let request = buildIntradayRequest(method: .WEB_SOCKET, resource: resource, symbol: symbol, oddLot: oddLot)
 
         let promise = self.eventLoopGroup.next().makePromise(of: Void.self)
-        WebSocket.connect(to: request.url, on: self.eventLoopGroup) { ws in
+        WebSocket.connect(to: request.url, on: self.eventLoopGroup) { [weak self] ws in
             ws.onText { ws, json in
+                self?.logger.debug("websocket response: \(json)")
+
                 guard let result = Mapper<T>().map(JSONString: json) else {
                     callback?(.failure(ClientError.jsonError(rawValue: json)))
                     return
