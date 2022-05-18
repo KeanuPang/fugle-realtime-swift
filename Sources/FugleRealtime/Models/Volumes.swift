@@ -8,7 +8,7 @@
 import Foundation
 import ObjectMapper
 
-public class VolumesData: MappableDataClass, ResourceType {
+public class VolumesData: DataResource {
     public var volumes = [Volumes]()
 
     public static var resource: IntradayResource {

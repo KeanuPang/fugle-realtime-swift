@@ -8,6 +8,8 @@
 import Foundation
 import ObjectMapper
 
+public typealias DataResource = MappableDataClass & ResourceType
+
 public protocol MappableData: Mappable {
     var apiVersion: String? { get set }
     var info: Info? { get set }

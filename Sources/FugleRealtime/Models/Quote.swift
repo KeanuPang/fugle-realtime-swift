@@ -8,7 +8,7 @@
 import Foundation
 import ObjectMapper
 
-public class QuoteData: MappableDataClass, ResourceType {
+public class QuoteData: DataResource {
     public var quote: Quote?
 
     public static var resource: IntradayResource {

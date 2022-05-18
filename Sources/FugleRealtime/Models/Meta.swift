@@ -8,7 +8,7 @@
 import Foundation
 import ObjectMapper
 
-open class MetaData: MappableDataClass, ResourceType {
+open class MetaData: DataResource {
     public var meta: Meta?
 
     public static var resource: IntradayResource {

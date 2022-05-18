@@ -8,7 +8,7 @@
 import Foundation
 import ObjectMapper
 
-public class DealtsData: MappableDataClass, ResourceType {
+public class DealtsData: DataResource {
     public var dealts = [Dealts]()
 
     public static var resource: IntradayResource {

@@ -8,7 +8,7 @@
 import Foundation
 import ObjectMapper
 
-public class ChartData: MappableDataClass, ResourceType {
+public class ChartData: DataResource {
     public var chart: Chart?
 
     public static var resource: IntradayResource {
