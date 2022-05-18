@@ -71,9 +71,12 @@ final class ClientTests: XCTestCase {
 
     func testDealtsRequest() async throws {
         do {
-            let response: DealtsData? = try await client.getIntraday(DealtsData.self, symbol: symbolId)
+            let response: DealtsData? = try await client.getIntradayDealts(symbol: symbolId, pagingLimit: 10)
 
-            XCTAssertEqual(symbolId, try XCTUnwrap(response?.info?.symbolId))
+            let dealts = try XCTUnwrap(response)
+
+            XCTAssertEqual(symbolId, try XCTUnwrap(dealts.info?.symbolId))
+            XCTAssertEqual(10, dealts.dealts.count)
         } catch {
             XCTFail(error.toString())
         }

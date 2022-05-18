@@ -42,6 +42,21 @@ public class FugleClient {
         logger.info("shutdown websocket client")
     }
 
+    public func getIntradayDealts(symbol: String, oddLot: Bool = false, pagingLimit: PAGING_LIMIT? = nil,
+                                  pagingOffset: PAGING_OFFSET? = nil) async throws -> DealtsData? {
+        let dealts = IntradayResource.dealts(pagingLimit ?? ClientConfig.pageLimitDealts, pagingOffset ?? 0)
+        logger.debug("get dealts resource \(symbol): \(dealts.name)")
+        let request = buildIntradayRequest(method: .HTTP, resource: dealts, symbol: symbol, oddLot: oddLot)
+        let response = try await client.execute(request, timeout: ClientConfig.requestTimeout)
+        let body = try await response.body.collect(upTo: ClientConfig.responseMaxSize)
+
+        guard response.status == .ok else {
+            throw Mapper<ClientError>().map(JSONString: String(buffer: body)) ?? ClientError.unexpectedError(info: request.url)
+        }
+
+        return Mapper<DealtsData>().map(JSONString: String(buffer: body))
+    }
+
     public func getIntraday<T>(_ type: T.Type, symbol: String, oddLot: Bool = false) async throws -> T? where T: DataResource {
         logger.debug("get resource \(symbol): \(type.resource.name)")
         let request = buildIntradayRequest(method: .HTTP, resource: type.resource, symbol: symbol, oddLot: oddLot)

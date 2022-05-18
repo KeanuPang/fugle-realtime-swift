@@ -12,7 +12,7 @@ public class DealtsData: DataResource {
     public var dealts = [Dealts]()
 
     public static var resource: IntradayResource {
-        return .dealts()
+        return .dealts(ClientConfig.pageLimitDealts, 0)
     }
 
     override public func mapping(map: Map) {
