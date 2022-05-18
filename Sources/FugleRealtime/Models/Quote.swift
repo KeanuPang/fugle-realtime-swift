@@ -8,6 +8,7 @@
 import Foundation
 import ObjectMapper
 
+/// Quote data class for Fugle intraday endpoint
 public class QuoteData: DataResource {
     public var quote: Quote?
 

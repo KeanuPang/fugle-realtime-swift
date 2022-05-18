@@ -8,6 +8,7 @@
 import Foundation
 import ObjectMapper
 
+/// Chart data class for Fugle intraday endpoint
 public class ChartData: DataResource {
     public var chart: Chart?
 

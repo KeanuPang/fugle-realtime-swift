@@ -12,7 +12,6 @@ enum DefaultEnvironment: String {
     case FUGLE_API_TOKEN
     case REQUEST_TIMEOUT
     case DEALTS_PAGE_LIMIT
-
     case DISABLE_LOGGER
 
     var value: String? {
@@ -20,7 +19,7 @@ enum DefaultEnvironment: String {
     }
 }
 
-public struct ClientConfig {
+struct ClientConfig {
     private static var apiToken: String?
 
     static var requestTimeout: TimeAmount {

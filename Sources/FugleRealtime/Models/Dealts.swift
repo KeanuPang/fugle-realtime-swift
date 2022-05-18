@@ -8,6 +8,7 @@
 import Foundation
 import ObjectMapper
 
+/// Dealts data class for Fugle intraday endpoint
 public class DealtsData: DataResource {
     public var dealts = [Dealts]()
 

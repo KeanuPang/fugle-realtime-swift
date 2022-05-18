@@ -8,6 +8,7 @@
 import Foundation
 import ObjectMapper
 
+/// Candles data class for Fugle marketdata endpoint
 public class CandleData: Mappable {
     public var symbolId: String?
     public var type: String?

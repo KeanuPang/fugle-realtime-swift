@@ -15,9 +15,17 @@ import NIOWebSocket
 import ObjectMapper
 import WebSocketKit
 
+/// The main HTTP and WebSocket client for Fulge Intraday/Marketdata endpoints.
 public class FugleClient {
+    /// Build and return the client single instance.
     public static let shared = FugleClient()
 
+    /**
+     Pass the API token as parameter to build and return client instance.
+
+     - parameter token: The Fugle api token.
+     - returns: The created client instance.
+     */
     public static func initWithApiToken(_ token: String) -> FugleClient {
         ClientConfig.setApiToken(token)
         return FugleClient.shared
@@ -32,16 +40,28 @@ public class FugleClient {
         self.client = HTTPClient(eventLoopGroupProvider: .createNew)
     }
 
+    /// Shutdown the HTTP client.
     public func shutdown() {
         try? self.client.syncShutdown()
         logger.info("shutdown client")
     }
 
+    /// Shutdown the WebSocket client gracefully.
     public func shutdownWS() {
         try? self.eventLoopGroup.next().syncShutdownGracefully()
         logger.info("shutdown websocket client")
     }
 
+    /**
+     Get the Dealts result data in day from Intraday endpoint.
+
+     - parameter symbol:        The symbol id to get dealts data.
+     - parameter oddLot:        Only get the odd lot data, default is false.
+     - parameter pagingLimit:   Returns data size by this time, defaults to `50`.
+     - parameter pagingOffset:  Specify the page number which is zero-based index, defaults to `0`.
+     - returns:                 The `DealtsData` model result by the specified symbol.
+     - note:                    Before calling the Fugle API, your should specify API token first for this client.
+     */
     public func getIntradayDealts(symbol: String, oddLot: Bool = false, pagingLimit: PAGING_LIMIT? = nil,
                                   pagingOffset: PAGING_OFFSET? = nil) async throws -> DealtsData? {
         let dealts = IntradayResource.dealts(pagingLimit ?? ClientConfig.pageLimitDealts, pagingOffset ?? 0)
@@ -57,6 +77,15 @@ public class FugleClient {
         return Mapper<DealtsData>().map(JSONString: String(buffer: body))
     }
 
+    /**
+     Get the intraday result data in day from Intraday endpoint.
+
+     - parameter type:      Data type implementation for this query, please refer to `MappableDataClass`.
+     - parameter symbol:    The symbol id to get data by type.
+     - parameter oddLot:    Only get the odd lot data, default is false.
+     - returns:             The model data by the specified symbol.
+     - note:                Before calling the Fugle API, your should specify API token first for this client.
+     */
     public func getIntraday<T>(_ type: T.Type, symbol: String, oddLot: Bool = false) async throws -> T? where T: MappableDataClass {
         guard let resource = (type as? ResourceType.Type)?.resource else { return nil }
 
@@ -72,6 +101,15 @@ public class FugleClient {
         return Mapper<T>().map(JSONString: String(buffer: body))
     }
 
+    /**
+     Get the historical data by symbol from Marketdata endpoint.
+
+     - parameter symbol:    The symbol id to get the historical data.
+     - parameter from:      Starts of day with format `YYYY-mm-dd`.
+     - parameter to:        Ends of day with format `YYYY-mm-dd`.
+     - returns:             The `CandleData` model result by the specified symbol.
+     - note:                Before calling the Fugle API, your should specify API token first for this client.
+     */
     public func getMarketData(symbol: String, from: String, to: String) async throws -> CandleData? {
         logger.debug("get market data \(symbol): \(from), \(to)")
         let request = buildMarketDataRequest(symbol: symbol, from: from, to: to)
@@ -122,6 +160,27 @@ public class FugleClient {
 }
 
 extension FugleClient {
+    /**
+     Get the realtime intraday result data in day from Intraday endpoint.
+
+     Examples of callback:
+
+     ```
+     let dataCallback: ((Result<MetaData, ClientError>) -> Void) = {
+        switch $0 {
+            case .success(let result):
+            case .failure(let failures):
+        }
+     }
+     ```
+
+     - parameter type:      Data type implementation for this query, please refer to `MappableDataClass`.
+     - parameter symbol:    The symbol id to get data by type.
+     - parameter oddLot:    Only get the odd lot data, default is false.
+     - parameter callback:  Realtime data callback from websocket subscription.
+     - returns:             The promise returned after connection was successfully established.
+     - note:                Before calling the Fugle API, your should specify API token first for this client.
+     */
     public func streamIntraday<T>(_ type: T.Type, symbol: String, oddLot: Bool = false, callback: ((Result<T, ClientError>) -> Void)?) async throws -> EventLoopPromise<Void>
         where T: MappableDataClass {
         guard let resource: IntradayResource = (type as? ResourceType.Type)?.resource else {

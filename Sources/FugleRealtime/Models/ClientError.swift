@@ -7,6 +7,7 @@
 
 import ObjectMapper
 
+/// Error code for FugleClient
 public enum ClientErrorCode: String {
     case invalidTokenOrUrl
     case unexpectedError
@@ -21,6 +22,7 @@ public enum ClientErrorCode: String {
     }
 }
 
+/// Error class to handle errors in FugleClient
 public class ClientError: MappableData, Error {
     public var apiVersion: String?
     public var info: Info?

@@ -27,7 +27,7 @@ enum ENDPOINT_METHOD: String {
 public typealias PAGING_LIMIT = UInt
 public typealias PAGING_OFFSET = UInt
 
-public enum IntradayResource {
+enum IntradayResource {
     case chart
     case quote
     case meta
@@ -59,13 +59,13 @@ public enum IntradayResource {
     }
 }
 
-public enum IntradayParameters: String, CaseIterable {
+enum IntradayParameters: String, CaseIterable {
     case symbolId
     case apiToken
     case oddLot
 }
 
-public enum CandleParameters: String, CaseIterable {
+enum CandleParameters: String, CaseIterable {
     case symbolId
     case apiToken
     case from

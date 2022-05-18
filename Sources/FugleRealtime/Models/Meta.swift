@@ -8,6 +8,7 @@
 import Foundation
 import ObjectMapper
 
+/// Meta data class for Fugle intraday endpoint
 open class MetaData: DataResource {
     public var meta: Meta?
 

@@ -8,6 +8,7 @@
 import Foundation
 import ObjectMapper
 
+/// Volumes data class for Fugle intraday endpoint
 public class VolumesData: DataResource {
     public var volumes = [Volumes]()
 
