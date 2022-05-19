@@ -57,9 +57,11 @@ public class FugleClient {
         return Mapper<DealtsData>().map(JSONString: String(buffer: body))
     }
 
-    public func getIntraday<T>(_ type: T.Type, symbol: String, oddLot: Bool = false) async throws -> T? where T: DataResource {
-        logger.debug("get resource \(symbol): \(type.resource.name)")
-        let request = buildIntradayRequest(method: .HTTP, resource: type.resource, symbol: symbol, oddLot: oddLot)
+    public func getIntraday<T>(_ type: T.Type, symbol: String, oddLot: Bool = false) async throws -> T? where T: MappableDataClass {
+        guard let resource = (type as? ResourceType.Type)?.resource else { return nil }
+
+        logger.debug("get resource \(symbol): \(resource.name)")
+        let request = buildIntradayRequest(method: .HTTP, resource: resource, symbol: symbol, oddLot: oddLot)
         let response = try await client.execute(request, timeout: ClientConfig.requestTimeout)
         let body = try await response.body.collect(upTo: ClientConfig.responseMaxSize)
 
@@ -121,8 +123,10 @@ public class FugleClient {
 
 extension FugleClient {
     public func streamIntraday<T>(_ type: T.Type, symbol: String, oddLot: Bool = false, callback: ((Result<T, ClientError>) -> Void)?) async throws -> EventLoopPromise<Void>
-        where T: DataResource {
-        let resource: IntradayResource = type.resource
+        where T: MappableDataClass {
+        guard let resource: IntradayResource = (type as? ResourceType.Type)?.resource else {
+            throw ClientError.unsupportedEroor(info: "invalid resource type")
+        }
         switch resource {
         case .dealts(_, _),
              .volumes:
