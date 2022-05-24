@@ -19,6 +19,7 @@ let package = Package(
         .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.10.0"),
         .package(url: "https://github.com/tristanhimmelman/ObjectMapper.git", from: "4.2.0"),
         .package(url: "https://github.com/vapor/websocket-kit.git", from: "2.3.1"),
+        .package(url: "https://github.com/KeanuPang/tulipindicators-swift", branch: "master")
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -29,6 +30,7 @@ let package = Package(
                 .product(name: "AsyncHTTPClient", package: "async-http-client"),
                 .product(name: "ObjectMapper", package: "ObjectMapper"),
                 .product(name: "WebSocketKit", package: "websocket-kit"),
+                .product(name: "tulipindicators", package: "tulipindicators-swift")
             ]),
         .testTarget(
             name: "FugleRealtimeTests",
