@@ -36,13 +36,13 @@ final class IndicatorTests: XCTestCase {
 
             let input = candleData.map { $0.close?.doubleValue ?? 0 }
 
-            let resultSMA = try XCTUnwrap(Indicator.SMA.calculate(input: input, options: 3))
+            let resultSMA = try XCTUnwrap(Indicator.SMA(3).calculate(input: input))
             XCTAssertEqual(false, resultSMA.1.isEmpty)
 
-            let resultEMA = try XCTUnwrap(Indicator.EMA.calculate(input: input, options: 3))
+            let resultEMA = try XCTUnwrap(Indicator.EMA(3).calculate(input: input))
             XCTAssertEqual(false, resultEMA.1.isEmpty)
 
-            let resultWMA = try XCTUnwrap(Indicator.WMA.calculate(input: input, options: 3))
+            let resultWMA = try XCTUnwrap(Indicator.WMA(3).calculate(input: input))
             XCTAssertEqual(false, resultWMA.1.isEmpty)
 
             let resultMACD = try XCTUnwrap(Indicator.MACD(5, 8, 3).calculate(input: input))
@@ -63,11 +63,29 @@ final class IndicatorTests: XCTestCase {
 
             let input = candleData.map { $0.close?.doubleValue ?? 0 }
 
-            let resultRSI = try XCTUnwrap(Indicator.RSI.calculate(input: input, options: 3))
+            let resultRSI = try XCTUnwrap(Indicator.RSI(3).calculate(input: input))
             XCTAssertEqual(false, resultRSI.1.isEmpty)
 
-            let resultStochRSI = try XCTUnwrap(Indicator.StochRSI.calculate(input: input, options: 3))
+            let resultStochRSI = try XCTUnwrap(Indicator.StochRSI(3).calculate(input: input))
             XCTAssertEqual(false, resultStochRSI.1.isEmpty)
+
+        } catch {
+            XCTFail(error.toString())
+        }
+    }
+
+    func testStoch() async throws {
+        client = FugleClient.initWithApiToken(apiToken)
+
+        do {
+            let responseData = try await client.getMarketData(symbol: symbolId, from: dateFrom, to: dateTo)
+            let candleData = try XCTUnwrap(responseData?.candles)
+
+            XCTAssertFalse(candleData.isEmpty)
+
+            let resultKD = try XCTUnwrap(Indicator.Stochastic(3, 5, 8).calculate(candleDetails: candleData))
+            XCTAssertEqual(false, resultKD.1.k.isEmpty)
+            XCTAssertEqual(false, resultKD.1.d.isEmpty)
 
         } catch {
             XCTFail(error.toString())
