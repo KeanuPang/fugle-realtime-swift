@@ -8,22 +8,6 @@
 import Foundation
 import tulipindicators
 
-/// Parameter types for Indicator
-public typealias Period_Int = Int
-public typealias MACD_Short_Slow_Int = Int
-public typealias MACD_Long_Fast_Int = Int
-public typealias MACD_Signal_Int = Int
-public typealias Period_K_Int = Int
-public typealias Period_K_Slow_Int = Int
-public typealias Period_D_Int = Int
-
-public struct IndicatorStochResult {
-    /// The stoch K values
-    public let k: [Double]
-    /// The stoch D values
-    public let d: [Double]
-}
-
 public enum Indicator: RawRepresentable {
     /// Simple Moving Average (SMA)
     case SMA(Period_Int)
@@ -40,7 +24,10 @@ public enum Indicator: RawRepresentable {
     case StochRSI(Period_Int)
 
     /// Stochastic Oscillator (KD)
-    case Stochastic(Period_K_Int, Period_K_Slow_Int, Period_D_Int)
+    case KD(Period_K_Int, Period_K_Slow_Int, Period_D_Int)
+
+    /// Bollinger Bands (BB)
+    case BB(Period_Int, StdDev_Double)
 
     public init?(rawValue: String) {
         return nil
@@ -53,68 +40,44 @@ public enum Indicator: RawRepresentable {
         case .EMA:
             return "ema"
         case .WMA:
-            return "wmv"
+            return "wma"
         case .MACD:
             return "macd"
         case .RSI:
             return "rsi"
         case .StochRSI:
             return "stochrsi"
-        case .Stochastic:
+        case .KD:
             return "stoch"
+        case .BB:
+            return "bbands"
         }
     }
 
-    public func calculate(input: [Double]) -> (Int, [Double])? {
-        guard !input.isEmpty else { return nil }
+    public func calculate<T: IndicatorResult>(input: [Double] = [Double](), stochInput: [CandleDetails] = [CandleDetails]()) -> T? {
+        if input.isEmpty, stochInput.isEmpty { return nil }
 
         var options = [Double]()
         switch self {
-        case .EMA(let period),
-             .RSI(let period),
-             .SMA(let period),
-             .StochRSI(let period),
-             .WMA(let period):
+        case
+            .EMA(let period),
+            .RSI(let period),
+            .SMA(let period),
+            .StochRSI(let period),
+            .WMA(let period):
             options = [Double(period)]
         case .MACD(let short, let long, let signal):
             options = [Double(short), Double(long), Double(signal)]
-        case .Stochastic:
-            return nil
-        }
-
-        return Tulip.call_indicator(name: self.rawValue, inputs: input, options: options)
-    }
-
-    public func calculate(candleDetails: [CandleDetails]) -> (Int, IndicatorStochResult)? {
-        guard !candleDetails.isEmpty else { return nil }
-
-        switch self {
-        case .Stochastic(let kPeriod, let kSlowPeriod, let dPeriod):
-
-            let inputs = candleDetails.map {
-                return IndicatorStochInput(candleData: $0)
-            }
-
+        case .BB(let period, let stdDev):
+            let result = bbands(input, period: period, stddev: stdDev)
+            return IndicatorBBResult(lower: result.1.lower, middle: result.1.middle, upper: result.1.upper) as? T
+        case .KD(let kPeriod, let kSlowPeriod, let dPeriod):
+            let inputs = stochInput.map { IndicatorStochInput(candleData: $0) }
             let result = stoch(inputs, kPeriod: kPeriod, kSlowingPeriod: kSlowPeriod, dPeriod: dPeriod)
-            return (result.0, IndicatorStochResult(k: result.1.K, d: result.1.D))
-        default:
-            return nil
+            return IndicatorStochResult(k: result.1.K, d: result.1.D) as? T
         }
-    }
-}
 
-struct IndicatorStochInput: Quotable {
-    var high: Double
-    var low: Double
-    var open: Double
-    var close: Double
-    var volume: Int
-
-    init(candleData: CandleDetails) {
-        self.high = candleData.high?.doubleValue ?? 0
-        self.low = candleData.low?.doubleValue ?? 0
-        self.open = candleData.open?.doubleValue ?? 0
-        self.close = candleData.close?.doubleValue ?? 0
-        self.volume = Int(candleData.volume ?? UInt64(0))
+        let result = Tulip.call_indicator(name: self.rawValue, inputs: input, options: options)
+        return IndicatorGenericResult(result: result.1) as? T
     }
 }
