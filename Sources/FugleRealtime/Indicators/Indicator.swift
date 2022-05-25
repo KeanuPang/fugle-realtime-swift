@@ -29,6 +29,9 @@ public enum Indicator: RawRepresentable {
     /// Bollinger Bands (BB)
     case BB(Period_Int, StdDev_Double)
 
+    /// Average True Range (ATR)
+    case ATR(Period_Int)
+
     public init?(rawValue: String) {
         return nil
     }
@@ -51,11 +54,13 @@ public enum Indicator: RawRepresentable {
             return "stoch"
         case .BB:
             return "bbands"
+        case .ATR:
+            return "atr"
         }
     }
 
-    public func calculate<T: IndicatorResult>(input: [Double] = [Double](), stochInput: [CandleDetails] = [CandleDetails]()) -> T? {
-        if input.isEmpty, stochInput.isEmpty { return nil }
+    public func calculate<T: IndicatorResult>(input: [Double] = [Double](), inputs: [CandleDetails] = [CandleDetails]()) -> T? {
+        if input.isEmpty, inputs.isEmpty { return nil }
 
         var options = [Double]()
         switch self {
@@ -66,18 +71,26 @@ public enum Indicator: RawRepresentable {
             .StochRSI(let period),
             .WMA(let period):
             options = [Double(period)]
+
         case .MACD(let short, let long, let signal):
             options = [Double(short), Double(long), Double(signal)]
+
         case .BB(let period, let stdDev):
             let result = bbands(input, period: period, stddev: stdDev)
             return IndicatorBBResult(lower: result.1.lower, middle: result.1.middle, upper: result.1.upper) as? T
+
         case .KD(let kPeriod, let kSlowPeriod, let dPeriod):
-            let inputs = stochInput.map { IndicatorStochInput(candleData: $0) }
-            let result = stoch(inputs, kPeriod: kPeriod, kSlowingPeriod: kSlowPeriod, dPeriod: dPeriod)
-            return IndicatorStochResult(k: result.1.K, d: result.1.D) as? T
+            let mInputs = inputs.map { IndicatorInputs(candleData: $0) }
+            let result = stoch(mInputs, kPeriod: kPeriod, kSlowingPeriod: kSlowPeriod, dPeriod: dPeriod)
+            return IndicatorKDResult(k: result.1.K, d: result.1.D) as? T
+
+        case .ATR(let period):
+            let mInputs = inputs.map { IndicatorInputs(candleData: $0) }
+            let result = atr(mInputs, period: period)
+            return IndicatorGeneralResult(result: result.1) as? T
         }
 
         let result = Tulip.call_indicator(name: self.rawValue, inputs: input, options: options)
-        return IndicatorGenericResult(result: result.1) as? T
+        return IndicatorGeneralResult(result: result.1) as? T
     }
 }

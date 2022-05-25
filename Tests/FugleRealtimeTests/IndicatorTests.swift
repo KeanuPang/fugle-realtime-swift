@@ -35,7 +35,7 @@ final class IndicatorTests: XCTestCase {
             XCTAssertFalse(candleData.isEmpty)
 
             let input = candleData.map { $0.close?.doubleValue ?? 0 }
-            var result: IndicatorGenericResult
+            var result: IndicatorGeneralResult
 
             result = try XCTUnwrap(Indicator.SMA(3).calculate(input: input))
             XCTAssertEqual(false, result.isEmpty)
@@ -63,19 +63,20 @@ final class IndicatorTests: XCTestCase {
             XCTAssertFalse(candleData.isEmpty)
 
             let input = candleData.map { $0.close?.doubleValue ?? 0 }
-            var resultRSI: IndicatorGenericResult
-            resultRSI = try XCTUnwrap(Indicator.RSI(3).calculate(input: input))
-            XCTAssertEqual(false, resultRSI.isEmpty)
+            var result: IndicatorGeneralResult
 
-            resultRSI = try XCTUnwrap(Indicator.StochRSI(3).calculate(input: input))
-            XCTAssertEqual(false, resultRSI.isEmpty)
+            result = try XCTUnwrap(Indicator.RSI(3).calculate(input: input))
+            XCTAssertEqual(false, result.isEmpty)
+
+            result = try XCTUnwrap(Indicator.StochRSI(3).calculate(input: input))
+            XCTAssertEqual(false, result.isEmpty)
 
         } catch {
             XCTFail(error.toString())
         }
     }
 
-    func testStoch() async throws {
+    func testKD() async throws {
         client = FugleClient.initWithApiToken(apiToken)
 
         do {
@@ -84,8 +85,8 @@ final class IndicatorTests: XCTestCase {
 
             XCTAssertFalse(candleData.isEmpty)
 
-            let resultKD: IndicatorStochResult = try XCTUnwrap(Indicator.KD(3, 5, 8).calculate(stochInput: candleData))
-            XCTAssertEqual(false, resultKD.isEmpty)
+            let result: IndicatorKDResult = try XCTUnwrap(Indicator.KD(3, 5, 8).calculate(inputs: candleData))
+            XCTAssertEqual(false, result.isEmpty)
 
         } catch {
             XCTFail(error.toString())
@@ -108,6 +109,23 @@ final class IndicatorTests: XCTestCase {
             print(resultBB.middle)
             print(resultBB.upper)
             XCTAssertEqual(false, resultBB.isEmpty)
+
+        } catch {
+            XCTFail(error.toString())
+        }
+    }
+
+    func testATR() async throws {
+        client = FugleClient.initWithApiToken(apiToken)
+
+        do {
+            let responseData = try await client.getMarketData(symbol: symbolId, from: dateFrom, to: dateTo)
+            let candleData = try XCTUnwrap(responseData?.candles)
+
+            XCTAssertFalse(candleData.isEmpty)
+
+            let result: IndicatorGeneralResult = try XCTUnwrap(Indicator.ATR(3).calculate(inputs: candleData))
+            XCTAssertEqual(false, result.isEmpty)
 
         } catch {
             XCTFail(error.toString())

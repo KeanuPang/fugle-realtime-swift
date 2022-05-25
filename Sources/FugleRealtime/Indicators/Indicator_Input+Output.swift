@@ -18,7 +18,7 @@ public typealias Period_K_Slow_Int = Int
 public typealias Period_D_Int = Int
 public typealias StdDev_Double = Double
 
-struct IndicatorStochInput: Quotable {
+struct IndicatorInputs: Quotable {
     var high: Double
     var low: Double
     var open: Double
@@ -38,7 +38,7 @@ public protocol IndicatorResult {
     var isEmpty: Bool { get }
 }
 
-public struct IndicatorGenericResult: IndicatorResult {
+public struct IndicatorGeneralResult: IndicatorResult {
     public let result: [Double]
 
     public var isEmpty: Bool {
@@ -46,7 +46,7 @@ public struct IndicatorGenericResult: IndicatorResult {
     }
 }
 
-public struct IndicatorStochResult: IndicatorResult {
+public struct IndicatorKDResult: IndicatorResult {
     /// The stoch K values
     public let k: [Double]
     /// The stoch D values
